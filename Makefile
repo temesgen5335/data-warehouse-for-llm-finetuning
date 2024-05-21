@@ -12,7 +12,7 @@ clean:
 	docker rmi $(shell docker images -qf dangling=true)
 
 serve:
-	uvicorn api:app --reload
+	uvicorn api.main:app --reload
 
 test:
 	while read line; do echo $$line | xargs http; done < test_main.http
