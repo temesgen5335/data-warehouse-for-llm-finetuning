@@ -19,3 +19,7 @@ async def say_hello(user_id: int, name: str):
         "user_id": f"{user_id}"
     }
     return response
+
+@app.get("/api/content")
+async def get_content():
+    return {"content": "This is the content of the API" }

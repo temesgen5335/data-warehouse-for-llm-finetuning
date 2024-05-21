@@ -14,3 +14,6 @@ GET http://127.0.0.1:8000/hello/user_User/1
 Accept: application/json
 
 ###
+
+GET http://127.0.0.1:8000/api/content
+Accept: application/json

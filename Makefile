@@ -1,4 +1,4 @@
-.PHONY: start stop
+.PHONY: up down clean serve test
 
 up:
 	docker compose up -d
@@ -10,3 +10,9 @@ clean:
 	make stop
 	docker volume rm $(shell docker volume ls -qf dangling=true)
 	docker rmi $(shell docker images -qf dangling=true)
+
+serve:
+	uvicorn api:app --reload
+
+test:
+	while read line; do echo $$line | xargs http; done < test_main.http
