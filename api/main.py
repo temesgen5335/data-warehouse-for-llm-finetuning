@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from src.mongo_db import get_collection
 
 app = FastAPI()
 
@@ -22,4 +23,7 @@ async def say_hello(user_id: int, name: str):
 
 @app.get("/api/content")
 async def get_content():
-    return {"content": "This is the content of the API" }
+    # Get content from MongoDB
+    
+
+    return {"content": ["helo", "this is an array", 5] }

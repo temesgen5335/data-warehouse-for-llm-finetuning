@@ -11,3 +11,11 @@ def test_get_content():
     assert response.json() == {
         "content": "This is the content of the API"
     }
+
+def test_say_hello():
+    name = "peter"
+    response = client.get(f"hello/{name}")
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": f"Hello {name}"
+    }
