@@ -15,7 +15,7 @@ app = Client("my_account", CONFIG["telegram_api_id"], CONFIG["telegram_hash"])
 chat_id = "tikvahethiopia"
 
 async def main():
-    with open('messages.csv', 'w', newline='', encoding='utf-8') as csvfile:
+    with open('../data/messages.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         async with app:
             async for message in app.get_chat_history(chat_id):
