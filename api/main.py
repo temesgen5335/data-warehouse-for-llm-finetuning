@@ -26,4 +26,4 @@ async def get_content():
     # Get content from MongoDB
     
 
-    return {"content": ["helo", "this is an array", 5] }
+    return {"content": "This is the content of the API" }
