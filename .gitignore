@@ -7,3 +7,4 @@ webenv
 data
 
 .env
+messages.csv
