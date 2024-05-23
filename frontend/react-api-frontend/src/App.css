@@ -13,6 +13,11 @@
   }
 }
 
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
