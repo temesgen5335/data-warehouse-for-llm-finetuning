@@ -1126,3 +1126,59 @@
 [2024-05-23T12:12:21.835+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:12:21.834+0000] {dag.py:3096} INFO - Sync 1 DAGs
 [2024-05-23T12:12:21.852+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:12:21.851+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
 [2024-05-23T12:12:21.865+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.054 seconds
+[2024-05-23T12:13:22.993+0000] {processor.py:161} INFO - Started process (PID=8067) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:22.993+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:13:22.995+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:22.994+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:23.001+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:23.020+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:23.020+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:13:23.048+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:23.048+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:13:23.064+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.076 seconds
+[2024-05-23T12:13:53.142+0000] {processor.py:161} INFO - Started process (PID=8127) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:53.142+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:13:53.143+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:53.143+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:53.148+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:13:53.162+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:53.162+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:13:53.180+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:13:53.179+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:13:53.193+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.055 seconds
+[2024-05-23T12:14:23.334+0000] {processor.py:161} INFO - Started process (PID=8188) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:23.335+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:14:23.337+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:23.336+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:23.344+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:23.360+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:23.360+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:14:23.379+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:23.379+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:14:23.396+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.066 seconds
+[2024-05-23T12:14:53.573+0000] {processor.py:161} INFO - Started process (PID=8248) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:53.574+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:14:53.575+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:53.575+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:53.581+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:14:53.594+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:53.594+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:14:53.612+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:14:53.612+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:14:53.626+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.057 seconds
+[2024-05-23T12:15:23.974+0000] {processor.py:161} INFO - Started process (PID=8308) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:23.974+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:15:23.976+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:23.975+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:23.981+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:23.995+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:23.995+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:15:24.013+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:24.013+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:15:24.027+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.058 seconds
+[2024-05-23T12:15:54.554+0000] {processor.py:161} INFO - Started process (PID=8368) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:54.555+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:15:54.556+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:54.556+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:54.562+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:15:54.577+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:54.577+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:15:54.598+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:15:54.598+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:15:54.614+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.065 seconds
+[2024-05-23T12:16:24.720+0000] {processor.py:161} INFO - Started process (PID=8426) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:24.721+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:16:24.722+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:24.722+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:24.728+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:24.741+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:24.741+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:16:24.760+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:24.760+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:16:24.774+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.058 seconds
+[2024-05-23T12:16:55.610+0000] {processor.py:161} INFO - Started process (PID=8486) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:55.611+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T12:16:55.612+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:55.612+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:55.617+0000] {processor.py:840} INFO - DAG(s) 'llm_data_warehouse' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T12:16:55.630+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:55.630+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T12:16:55.647+0000] {logging_mixin.py:188} INFO - [2024-05-23T12:16:55.647+0000] {dag.py:3954} INFO - Setting next_dagrun for llm_data_warehouse to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T12:16:55.661+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.055 seconds
