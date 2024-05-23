@@ -21,6 +21,7 @@ async def say_hello(user_id: int, name: str):
     }
     return response
 
+# EDIT FROM HERE
 @app.get("/api/content")
 async def get_content():
     # Get content from MongoDB
