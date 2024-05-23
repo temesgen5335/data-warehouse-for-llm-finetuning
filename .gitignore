@@ -1,5 +1,7 @@
 /data/
 
+logs
+
 # Airflow configuration
 airflow.cfg
 airflow_login.py
@@ -14,7 +16,7 @@ airflow.db
 airflow/git_version
 airflow/www/static/coverage/
 airflow/www/*.log
-/logs/
+#/logs/
 airflow-webserver.pid
 standalone_admin_password.txt
 warnings.txt
