@@ -1,13 +1,16 @@
+# Scalable Data Warehouse for LLM Finetuning: API Design for High Throughput Data Ingestion and RAG Retrieval
+
 ## Introduction
 
 This project aims to create a scalable data warehouse for Language Model (LLM) fine-tuning. The data warehouse will store and manage the data collected in the specified language, in this case Amharic, which will be used for training and fine-tuning LLM. Docker has been used to ensure a seamless setup and deployment process.
+
 ## Features
 
 - **Amharic Language Support**: Our data warehouse is specifically designed to handle and manage data in the Amharic language. This makes it an ideal choice for projects involving the training of large language models on Amharic data.
 
 - **Highly Scalable Data Storage**: Our data warehouse is engineered to handle massive data volumes, making it an ideal choice for projects involving the training of large language models.
 
--  **Efficient Data Management**: This project provides a different tools for efficient data management, including features for data ingestion and transformation. This ensures that the Amharic data is always ready for training the LLM.
+- **Efficient Data Management**: This project provides a different tools for efficient data management, including features for data ingestion and transformation. This ensures that the Amharic data is always ready for training the LLM.
 
 - **User-friendly Interface built with ReactJS**: The project provides a user-friendly interface for interacting with the data warehouse. This makes it easy for users to manage, search, and access the data required for training the LLM.
 
@@ -38,8 +41,7 @@ pip install -r requirements.txt
 4. **Environment Variables**
     - Create a `.env` file in the root directory and add the following environment variables:
 
-
-5. **Build the application**
+5. **Start the application**
 
    - Run the following commands to get the container up and running and start the application:
       ```bash
@@ -63,4 +65,3 @@ The scalable data warehouse for LLM fine-tuning is an essential tool for managin
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
