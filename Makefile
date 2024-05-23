@@ -1,8 +1,12 @@
-.PHONY: up down clean serve test
+.PHONY: up init down clean serve test
 
 up:
+	make init
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml up -d
 	make serve
+
+init:
+	docker compose -f docker-compose_airflow.yaml up airflow-init
 
 down:
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml down
