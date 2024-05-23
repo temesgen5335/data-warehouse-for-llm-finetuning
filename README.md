@@ -1,3 +1,5 @@
+# Scalable Data Warehouse for LLM Finetuning: API Design for High Throughput Data Ingestion and RAG Retrieval
+
 ## Introduction
 
 This project aims to create a scalable data warehouse for Language Model (LLM) fine-tuning. The data warehouse will store and manage the data collected in the specified language, in this case Amharic, which will be used for training and fine-tuning LLM. Docker has been used to ensure a seamless setup and deployment process.
