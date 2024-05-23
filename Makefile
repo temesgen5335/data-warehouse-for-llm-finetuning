@@ -1,10 +1,11 @@
 .PHONY: up down clean serve test
 
 up:
-	docker compose up -d
+	docker compose -f docker-compose_airflow.yaml -f compose.yaml up -d
+	make serve
 
 down:
-	docker compose down
+	docker compose -f docker-compose_airflow.yaml -f compose.yaml down
 
 clean:
 	make stop
@@ -16,3 +17,4 @@ serve:
 
 test:
 	while read line; do echo $$line | xargs http; done < test_main.http
+
