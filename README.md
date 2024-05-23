@@ -41,7 +41,7 @@ pip install -r requirements.txt
     - Create a `.env` file in the root directory and add the following environment variables:
 
 
-5. **Build the application**
+5. **Start the application**
 
    - Run the following commands to get the container up and running and start the application:
       ```bash
