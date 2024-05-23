@@ -135,3 +135,10 @@
 [2024-05-23T10:56:13.969+0000] {logging_mixin.py:188} INFO - [2024-05-23T10:56:13.968+0000] {dag.py:3096} INFO - Sync 1 DAGs
 [2024-05-23T10:56:13.987+0000] {logging_mixin.py:188} INFO - [2024-05-23T10:56:13.987+0000] {dag.py:3954} INFO - Setting next_dagrun for test_hello_world to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
 [2024-05-23T10:56:14.001+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.056 seconds
+[2024-05-23T10:56:44.975+0000] {processor.py:161} INFO - Started process (PID=922) to work on /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T10:56:44.976+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/data_retrieval_dag.py for tasks to queue
+[2024-05-23T10:56:44.977+0000] {logging_mixin.py:188} INFO - [2024-05-23T10:56:44.977+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T10:56:44.982+0000] {processor.py:840} INFO - DAG(s) 'test_hello_world' retrieved from /opt/airflow/dags/data_retrieval_dag.py
+[2024-05-23T10:56:44.996+0000] {logging_mixin.py:188} INFO - [2024-05-23T10:56:44.996+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-05-23T10:56:45.014+0000] {logging_mixin.py:188} INFO - [2024-05-23T10:56:45.014+0000] {dag.py:3954} INFO - Setting next_dagrun for test_hello_world to 2024-05-23 00:00:00+00:00, run_after=2024-05-24 00:00:00+00:00
+[2024-05-23T10:56:45.028+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/data_retrieval_dag.py took 0.057 seconds
