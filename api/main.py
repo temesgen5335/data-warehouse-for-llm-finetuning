@@ -7,6 +7,7 @@ from database.mongodb import MongoDB
 app = FastAPI()
 mongo = MongoDB()
 
+# EXAMPLE ROUTES
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -28,6 +29,9 @@ async def say_hello(user_id: int, name: str):
 @app.get("/api/content")
 async def get_content():
     # Get content from MongoDB
+    # filter = {
+    #     "time_publish": "19 hours ago",
+    # }
     content = mongo.get_all_content_as_list()[:2]
 
     # Convert ObjectId to string
