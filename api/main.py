@@ -1,8 +1,11 @@
 from fastapi import FastAPI
-from src.mongo_db import get_collection
+
+import os
+os.chdir('../')
+from database.mongodb import MongoDB
 
 app = FastAPI()
-
+mongo = MongoDB()
 
 @app.get("/")
 async def root():
@@ -25,7 +28,13 @@ async def say_hello(user_id: int, name: str):
 @app.get("/api/content")
 async def get_content():
     # Get content from MongoDB
-    # collection = get_collection()
+    content = mongo.get_all_content_as_list()[:2]
 
-    return {"content": "content" }
+    # Convert ObjectId to string
+    for item in content:
+        item["_id"] = str(item["_id"])
+
+    print(content)
+
+    return { "content": content }
 
