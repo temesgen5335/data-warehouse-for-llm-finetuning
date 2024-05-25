@@ -29,4 +29,5 @@ async def get_content():
     content_list = list(collection.find({}, {"_id": 0}))
     
 
-    return {"content": "This is the content of the API", content_list }
+    return {"content": content_list }
+
