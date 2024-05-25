@@ -120,6 +120,8 @@ celerybeat-schedule
 .venv*
 venv*
 ENV/
+#beautifulSoup virtualenv
+webenv
 
 # Spyder project settings
 .spyderproject
