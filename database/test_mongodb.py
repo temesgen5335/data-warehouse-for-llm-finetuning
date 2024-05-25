@@ -26,3 +26,11 @@ def test_create_collection(mock_db):
     collection = mongodb.create_collection('test_collection')
     # Check if the collection is created with the correct name
     assert collection.name == mock_db['test_db']['test_collection'].name
+
+def test_insert_content(mock_db):
+    mongodb = MongoDB(collection_name='test_collection', db_name='test_db')
+    content = {"key": "value"}
+    result = mongodb.insert_content(content)
+    # Check if the content is inserted successfully
+    assert result.acknowledged == True
+    

@@ -5,7 +5,7 @@ from pymongo import MongoClient
 class MongoDB:
     def __init__(self, collection_name: str = None, db_name: str = None):
         load_dotenv()
-
+        # TODO Add error handling for missing environment variables and arguments
         # provide the mongodb atlas url to connect python to mongodb using pymongo
         self.CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING")
         self.MONGO_DB_NAME = os.getenv("MONGO_DB_NAME") if db_name is None else db_name
@@ -18,7 +18,8 @@ class MongoDB:
         # Create the database
         return self.client[self.MONGO_DB_NAME]
 
-    def create_collection(self, collection_name: str):
+    def create_collection(self, collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
         # Create the database
         db = self.client[self.MONGO_DB_NAME]
 
@@ -31,9 +32,10 @@ class MongoDB:
 
         return collection.find_one(filter_col)
 
-    def insert_content(self, db_name: str, collection_name: str, content: dict):
+    def insert_content(self, content: dict, collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
         # Insert content into MongoDB
-        collection = self.create_collection(db_name, collection_name)
+        collection = self.create_collection(collection_name)
 
         return collection.insert_one(content)
     
