@@ -3,21 +3,20 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 class MongoDB:
-    def __init__(self):
+    def __init__(self, collection_name: str = None, db_name: str = None):
         load_dotenv()
 
         # provide the mongodb atlas url to connect python to mongodb using pymongo
         self.CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING")
-        self.MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+        self.MONGO_DB_NAME = os.getenv("MONGO_DB_NAME") if db_name is None else db_name
+        self.MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME") if collection_name is None else collection_name
 
         # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
         self.client = MongoClient(self.CONNECTION_STRING)
 
-    def get_database(self, db_name: str = None):
-        if db_name is None:
-            db_name = self.MONGO_DB_NAME
+    def get_database(self):
         # Create the database
-        return self.client[db_name]
+        return self.client[self.MONGO_DB_NAME]
 
     def create_collection(self, db_name: str, collection_name: str):
         # Create the database
