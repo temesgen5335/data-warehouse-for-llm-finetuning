@@ -18,9 +18,9 @@ class MongoDB:
         # Create the database
         return self.client[self.MONGO_DB_NAME]
 
-    def create_collection(self, db_name: str, collection_name: str):
+    def create_collection(self, collection_name: str):
         # Create the database
-        db = self.client[db_name]
+        db = self.client[self.MONGO_DB_NAME]
 
         # Create the collection
         return db[collection_name]
@@ -36,12 +36,6 @@ class MongoDB:
         collection = self.create_collection(db_name, collection_name)
 
         return collection.insert_one(content)
-
-    def get_collection(self, db_name: str, collection_name: str):
-        # Get collection from MongoDB
-        db = self.client[db_name]
-
-        return db[collection_name]
     
     def get_all_content(self, db_name: str, collection_name: str, filter_col: dict = None):
         # Get all content from MongoDB
