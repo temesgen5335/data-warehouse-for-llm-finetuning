@@ -33,4 +33,14 @@ def test_insert_content(mock_db):
     result = mongodb.insert_content(content)
     # Check if the content is inserted successfully
     assert result.acknowledged == True
-    
+  
+def test_get_content(mock_db):
+    mongodb = MongoDB(collection_name='test_collection', db_name='test_db')
+    content = {"key": "value"}
+    mongodb.insert_content(content)
+    result = mongodb.get_content()
+    # Remove the '_id' field from the result and content before comparing
+    result.pop('_id', None)
+    content.pop('_id', None)
+    # Check if the content is retrieved successfully
+    assert result == content

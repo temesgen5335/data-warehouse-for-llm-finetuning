@@ -26,9 +26,10 @@ class MongoDB:
         # Create the collection
         return db[collection_name]
 
-    def get_content(self, db_name: str, collection_name: str, filter_col: dict = None):
+    def get_content(self, filter_col: dict = None, collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
         # Get content from MongoDB
-        collection = self.create_collection(db_name, collection_name)
+        collection = self.create_collection(collection_name)
 
         return collection.find_one(filter_col)
 
