@@ -13,6 +13,8 @@ class MongoDB:
 
         # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
         self.client = MongoClient(self.CONNECTION_STRING)
+        self.db = self.client[self.MONGO_DB_NAME]
+        self.collection = self.db[self.MONGO_COLLECTION_NAME]
 
     def get_database(self):
         # Create the database
@@ -32,6 +34,13 @@ class MongoDB:
         collection = self.create_collection(collection_name)
 
         return collection.find_one(filter_col)
+    
+    def get_all_content(self, filter_col: dict = None, collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
+        # Get all content from MongoDB
+        collection = self.create_collection(collection_name)
+
+        return collection.find(filter_col)
 
     def insert_content(self, content: dict, collection_name: str = None):
         collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
@@ -39,9 +48,3 @@ class MongoDB:
         collection = self.create_collection(collection_name)
 
         return collection.insert_one(content)
-    
-    def get_all_content(self, db_name: str, collection_name: str, filter_col: dict = None):
-        # Get all content from MongoDB
-        collection = self.create_collection(db_name, collection_name)
-
-        return collection.find(filter_col)
