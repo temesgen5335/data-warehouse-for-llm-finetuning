@@ -17,7 +17,8 @@ clean:
 	docker rmi $(shell docker images -qf dangling=true)
 
 serve:
-	uvicorn api.main:app --reload
+	mkdir -p ./api/logs
+	nohup uvicorn api.main:app --reload > ./api/logs/output.log 2>&1 &
 
 test:
 	while read line; do echo $$line | xargs http; done < test_main.http
