@@ -1,0 +1,22 @@
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+}
+
+input[type="text"] {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.data-table-container {
+  padding: 50px 10%;
+  background-color: gray;
+}
+
+.search-container {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 20px;
+}
