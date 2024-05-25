@@ -7,5 +7,15 @@ services:
     volumes:
       - mongodb_data_container:/data/db
 
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana_storage: /var/lib/grafana
+
 volumes:
   mongodb_data_container:
+  grafana_storage: {}
