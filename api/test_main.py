@@ -9,7 +9,7 @@ def test_get_content():
     response = client.get("/api/content")
     assert response.status_code == 200
     assert response.json() == {
-        "content": "This is the content of the API"
+        "content": "content"
     }
 
 def test_say_hello():

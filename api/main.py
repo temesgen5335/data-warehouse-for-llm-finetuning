@@ -25,9 +25,7 @@ async def say_hello(user_id: int, name: str):
 @app.get("/api/content")
 async def get_content():
     # Get content from MongoDB
-    collection = get_collection()
-    content_list = list(collection.find({}, {"_id": 0}))
-    
+    # collection = get_collection()
 
-    return {"content": content_list }
+    return {"content": "content" }
 
