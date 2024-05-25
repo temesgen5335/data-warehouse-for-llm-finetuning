@@ -42,6 +42,13 @@ class MongoDB:
 
         return collection.find(filter_col)
 
+    def get_all_content_as_list(self, filter_col: dict = None, collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
+        # Get all content from MongoDB
+        collection = self.create_collection(collection_name)
+
+        return list(collection.find(filter_col))
+
     def insert_content(self, content: dict, collection_name: str = None):
         collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
         # Insert content into MongoDB

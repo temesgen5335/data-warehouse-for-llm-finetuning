@@ -59,3 +59,17 @@ class TestMongoDB:
         
         # Check if all content is retrieved successfully
         assert results == content
+
+    def test_get_all_content_as_list(self, mock_db):
+        content = [{"key": "value1"}, {"key": "value2"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        results = self.mongodb.get_all_content_as_list()
+        # Remove the '_id' field from the results and content before comparing
+        for r in results:
+            r.pop('_id', None)
+        for c in content:
+            c.pop('_id', None)
+        
+        # Check if all content is retrieved successfully
+        assert results == content
