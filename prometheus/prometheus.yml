@@ -19,6 +19,12 @@ scrape_configs:
     static_configs:
       - targets:
         - localhost:9090
-  - job_name: promgreek # Change to whatever you like
-    # static_configs:
-    #   - targets: ['192.168.68.109:9100'] #Change this to your server's IP
+  - job_name: pipeline_metrics # Change to whatever you like
+    static_configs:
+      - targets: ['172.31.62.156:9100'] #Change this to your server's IP
+  - job_name: node_exporter_metrics # Change to whatever you like
+    static_configs:
+      - targets: ['172.31.62.156:9100'] #Change this to your server's IP
+  - job_name: pipeline_metrics # Change to whatever you like
+    static_configs:
+      - targets: ['172.31.62.156:9100'] #Change this to your server's IP
