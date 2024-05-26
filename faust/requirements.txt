@@ -1,0 +1,2 @@
+faust==1.10
+typing_extensions

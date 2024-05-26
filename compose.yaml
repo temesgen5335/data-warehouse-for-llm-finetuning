@@ -51,7 +51,11 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
 
-  
+  faust:
+    build: ./faust
+    command: faust -A myapp worker -l info
+    depends_on:
+      - kafka
 
 volumes:
   mongodb_data_container:
