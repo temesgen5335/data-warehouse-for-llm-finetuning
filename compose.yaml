@@ -14,8 +14,21 @@ services:
     ports:
       - "4000:3000"
     volumes:
-      - grafana_storage: /var/lib/grafana
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
 
 volumes:
   mongodb_data_container:
-  grafana_storage: {}
+  grafana-storage:
+  prom_data:
