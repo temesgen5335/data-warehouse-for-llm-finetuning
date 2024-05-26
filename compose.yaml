@@ -28,6 +28,15 @@ services:
       - ./prometheus:/etc/prometheus
       - prom_data:/prometheus
 
+  mongodb_exporter:
+    image: bitnami/mongodb-exporter
+    container_name: mongodb_exporter
+    ports:
+      - "9216:9216"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+    restart: unless-stopped
+
 volumes:
   mongodb_data_container:
   grafana-storage:
