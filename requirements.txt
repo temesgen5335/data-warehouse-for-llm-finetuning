@@ -14,3 +14,4 @@ nltk==3.8.1
 Scrapy~=2.11.2
 itemadapter~=0.9.0
 mongomock==4.1.2
+faust==1.10
