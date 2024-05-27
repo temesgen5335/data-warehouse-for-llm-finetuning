@@ -2,6 +2,7 @@
 
 up:
 	make init
+	docker compose up
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml up -d
 	make serve
 

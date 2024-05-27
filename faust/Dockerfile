@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 6066
 
 # Run faust when the container launches
-CMD ["faust", "-A", "app:app", "worker", "-l", "info"]
+CMD ["faust", "-A", "app", "worker", "-l", "info"]
