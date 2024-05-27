@@ -1,14 +1,13 @@
-.PHONY: up init down clean serve test up_without_faust up_faust start_airflow
+.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow
 
 up:
-	make init
 	make up_without_faust
 	docker compose -f compose.yaml build
 	make up_faust
 	make start_airflow
 	make serve
 
-init:
+airflow_init:
 	docker compose -f docker-compose_airflow.yaml up airflow-init
 
 up_without_faust:
@@ -18,10 +17,15 @@ up_faust:
 	docker compose -f compose.yaml up -d faust
 
 start_airflow:
+	mkdir -p ./dags ./logs ./plugins ./config
+	make airflow_init
 	docker compose -f docker-compose_airflow.yaml up -d
 
 down:
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml down
+
+stop_airflow:
+	docker compose -f docker-compose_airflow.yaml down
 
 clean:
 	make stop
