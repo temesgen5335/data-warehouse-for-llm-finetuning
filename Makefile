@@ -1,13 +1,21 @@
-.PHONY: up init down clean serve test
+.PHONY: up init down clean serve test up_without_faust up_faust
 
 up:
 	make init
-	docker compose up
-	docker compose -f docker-compose_airflow.yaml -f compose.yaml up -d
+	make up_without_faust
+	docker compose -f compose.yaml build
+	make up_faust
 	make serve
 
 init:
 	docker compose -f docker-compose_airflow.yaml up airflow-init
+
+up_without_faust:
+	docker compose -f docker-compose_airflow.yaml up -d
+	docker compose -f compose.yaml up -d --remove-orphans $(filter-out faust,$(shell docker-compose -f compose.yaml config --services))
+
+up_faust:
+	docker compose -f compose.yaml up -d faust
 
 down:
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml down
@@ -23,4 +31,3 @@ serve:
 
 test:
 	while read line; do echo $$line | xargs http; done < test_main.http
-
