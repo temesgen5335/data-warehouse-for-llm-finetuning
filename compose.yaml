@@ -60,7 +60,6 @@ services:
 
   faust:
     build: ./faust
-    command: /bin/sh -c "ls -l && faust -A app:app worker -l info"
     depends_on:
       - kafka
     environment:
