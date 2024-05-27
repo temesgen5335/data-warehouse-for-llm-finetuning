@@ -17,10 +17,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY wait-for-it.sh .
 RUN chmod +x wait-for-it.sh
 
-# Create a shell script that runs wait-for-it.sh and then faust
-# The wait-for-it.sh script is used to wait for the Kafka container to be ready
-RUN echo -e "#!/bin/sh\n./wait-for-it.sh kafka:9092 -- faust -A app worker -l info" > start.sh
-RUN chmod +x start.sh
+# # Create a shell script that runs wait-for-it.sh and then faust
+# # The wait-for-it.sh script is used to wait for the Kafka container to be ready
+# RUN echo -e '#!/bin/sh\n./wait-for-it.sh kafka:9092 -- faust -A app worker -l info' > start.sh
+# # Install dos2unix and convert the line endings of start.sh
+# RUN apt-get update && apt-get install -y dos2unix && dos2unix start.sh && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
+
+# RUN chmod +x start.sh
 
 # Run the start.sh script when the container launches
 CMD ["./start.sh"]
