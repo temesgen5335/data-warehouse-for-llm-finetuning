@@ -1,14 +1,18 @@
 import faust
 
-app = faust.App(
-    'hello-world',
-    broker='kafka://localhost:9092',
-    value_serializer='raw',
-)
+from datetime import datetime
+from models import ScrapedData
 
-greetings_topic = app.topic('greetings')
+app = faust.App('myapp', broker='kafka://localhost:9092',)
+topic = app.topic('scraped_data', value_type=ScrapedData)
 
-@app.agent(greetings_topic)
-async def greet(greetings):
-    async for greeting in greetings:
-        print(greeting)
+@app.agent(topic)
+async def process_data(scraped_data):
+  async for data in scraped_data:
+    # convert the title to uppercase
+    data.url = data.url.upper()
+
+    print(data)
+
+if __name__ == '__main__':
+    app.main()
