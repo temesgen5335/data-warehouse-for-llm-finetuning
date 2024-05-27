@@ -65,7 +65,6 @@ services:
       - kafka
     environment:
     - KAFKA_BROKER_URL=kafka://kafka:9092
-    - WEB_PORT:6066
 
     ports:
       - "6068:6066"
