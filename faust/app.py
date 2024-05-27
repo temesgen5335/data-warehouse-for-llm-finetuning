@@ -4,9 +4,9 @@ from datetime import datetime
 from models import ScrapedData
 
 app = faust.App('myapp', broker='kafka://localhost:9092',)
-topic = app.topic('scraped_data', value_type=ScrapedData)
+scraped_data_topic = app.topic('scraped_data', value_type=ScrapedData)
 
-@app.agent(topic)
+@app.agent(scraped_data_topic)
 async def process_data(scraped_data):
   async for data in scraped_data:
     # convert the title to uppercase
