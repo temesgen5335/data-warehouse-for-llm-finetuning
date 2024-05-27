@@ -4,6 +4,9 @@ data
 
 logs
 
+geckodriver
+geckodriver*
+
 # Airflow configuration
 airflow.cfg
 airflow_login.py
