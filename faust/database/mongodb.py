@@ -55,3 +55,10 @@ class MongoDB:
         collection = self.create_collection(collection_name)
 
         return collection.insert_one(content)
+
+    def insert_many_content(self, content: list[dict], collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
+        # Insert content into MongoDB
+        collection = self.create_collection(collection_name)
+
+        return collection.insert_many(content)

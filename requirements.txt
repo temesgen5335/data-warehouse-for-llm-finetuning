@@ -5,3 +5,5 @@ pymongo
 pandas
 selenium
 pytest
+fastapi
+uvicorn
