@@ -3,7 +3,11 @@ beautifulsoup4
 python-dotenv
 pymongo
 pandas
+<<<<<<< HEAD
 selenium
 nltk
 mongomock
 pytest
+=======
+selenium
+>>>>>>> 6487848afdaca29a4493f7ccf256000a652acc22
