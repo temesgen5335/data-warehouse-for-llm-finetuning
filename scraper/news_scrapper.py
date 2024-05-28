@@ -238,6 +238,36 @@ class NewsScraper:
             "published_date": published_date
         }
 
+    def process_article(self, article, category, pages_to_scrape):
+        try:
+            # Extract all details BEFORE navigating to the article page
+            image_url = self.get_image_url(article)
+            title = self.get_title(article)
+            article_url = self.get_article_url(article)
+            summary = self.get_summary(article)
+
+            # Open a new tab
+            self.driver.execute_script("window.open();")
+
+            # Switch to the new tab (it's always the last one)
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+
+            article_details = self.get_article_details(
+                article_url, image_url, summary, category.value, title
+            )
+
+            # Close the current tab
+            self.driver.close()
+
+            # Switch back to the original tab
+            self.driver.switch_to.window(self.driver.window_handles[0])
+
+            print(f"Success: 1")
+            pprint(article_details)
+        except Exception as e:
+            print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
+        
+
     def get_article_values(self) -> list[dict]:
         """Gets article data from the website."""
 
@@ -249,47 +279,13 @@ class NewsScraper:
             while pages_to_scrape > 0:
                 pages_to_scrape -= 1
                 articles = self.get_all_articles()
-                first_articles = articles[:2]  # Process only the first 5 articles
-                # pprint(first_articles)
+                first_articles = articles[:2]
 
                 if not articles:
                     print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
                 else:
-                    original_window = self.driver.current_window_handle
-
                     for article in first_articles:
-                        try:
-                            # Extract all details BEFORE navigating to the article page
-                            image_url = self.get_image_url(article)
-                            title = self.get_title(article)
-                            article_url = self.get_article_url(article)
-                            summary = self.get_summary(article)
-
-                            # Open a new tab
-                            self.driver.execute_script("window.open();")
-
-                            # Switch to the new tab (it's always the last one)
-                            self.driver.switch_to.window(self.driver.window_handles[-1])
-
-                            # Navigate to the article URL
-                            # self.driver.get(article_url)
-
-                            article_details = self.get_article_details(
-                                article_url, image_url, summary, category.value, title
-                            )
-
-                            # Close the current tab
-                            self.driver.close()
-
-                            # Switch back to the original tab
-                            self.driver.switch_to.window(original_window)
-
-                            # if article_details is not None:
-                            #     news.append(article_details)
-                            print(f"Success: 1")
-                            pprint(article_details)
-                        except Exception as e:
-                            print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
+                        self.process_article(article, category, pages_to_scrape)
 
                     next_page = self.get_next_page_element()
                     if next_page.text == NewsButton.NEXT_PAGE.value and pages_to_scrape > 0:
