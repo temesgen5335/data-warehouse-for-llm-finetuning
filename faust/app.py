@@ -7,14 +7,8 @@ from datetime import datetime
 from models import ScrapedData
 
 KAFKA_BROKER_URL = os.getenv('KAFKA_BROKER_URL', 'kafka://localhost:9093')
-<<<<<<< HEAD
-MONGODB_CONNECTION_STRING = 'mongodb://mongodb:27017/'
+MONGODB_CONNECTION_STRING = 'mongodb://host.docker.internal:27017/'
 
-=======
-
-MONGODB_CONNECTION_STRING = 'mongodb://mongodb:27017/'
-
->>>>>>> 6487848afdaca29a4493f7ccf256000a652acc22
 app = faust.App('myapp', broker=KAFKA_BROKER_URL)
 scraped_data_topic = app.topic('scraped_data', value_type=ScrapedData)
 
