@@ -7,3 +7,4 @@ selenium
 nltk
 mongomock
 pytest
+kafka-python
