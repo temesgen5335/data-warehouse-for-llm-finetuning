@@ -53,6 +53,7 @@ services:
     ports:
       - '9092:9092'
       - '9093:9093'
+      - '9094:9094'
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
@@ -71,11 +72,14 @@ services:
 
     ports:
       - "6068:6066"
-    environment:
-    - KAFKA_BROKER_URL=kafka://kafka:9092
 
-    ports:
-      - "6068:6066"
+  scraper:
+    build: ./scraper
+    volumes:
+      - ./scraper:/app
+    depends_on:
+      - mongodb
+      - faust
 
 volumes:
   mongodb_data_container:
