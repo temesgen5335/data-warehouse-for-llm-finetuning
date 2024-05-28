@@ -7,7 +7,7 @@ import os
 os.chdir('../')
 
 # import the MongoDB class from the database.mongodb module
-from database import MongoDB
+from database.mongodb import MongoDB
 
 class TestMongoDB:
     # Create a fixture to mock the database
