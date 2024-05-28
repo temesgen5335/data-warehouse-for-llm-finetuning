@@ -1,1 +1,1 @@
-from .models import ScrapedData
+from .models import ScrapedNews
