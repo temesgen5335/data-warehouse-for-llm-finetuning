@@ -268,9 +268,7 @@ class NewsScraper:
             print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
         
 
-    def get_article_values(self) -> list[dict]:
-        """Gets article data from the website."""
-
+    def scrape_news(self) -> list[dict]:
         news = []
         for category in NewsCategory:
             self.initialize_driver(category)
