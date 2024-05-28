@@ -217,74 +217,12 @@ class NewsScraper:
         except WebDriverException as e:
             print("Error occurred while retrieving the time publish of the article:", e)
             return ""
-    
-    # def collect_news(self) -> list[dict]:
-    #     news = self.get_article_values()
-    #     for n in news:
-    #         try:
-    #             self.driver.get(n.get('article_url'))
-    #             content = self.driver.find_element(By.ID, 'content-details').text
-    #             author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
-    #             date_published = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
-    #             n["pulished_date"] = date_published
-    #             n["author"] = author
-    #             n["content"] = content
-    #         except (WebDriverException, AttributeError, Exception) as e:
-    #             print(f"An error occurred while scraping content page of category {n.get('category')} and url {n.get('article_url')}:: {e}")
-    #     return news
-
-    # def get_article_values(self) -> list[dict]:
-    #     news = []
-    #     for category in NewsCategory:
-    #         self.initialize_driver(category)
-    #         pages_to_scrape = self.number_of_pages_to_scrape
-    #         while pages_to_scrape > 0:
-    #             pages_to_scrape -= 1
-    #             articles = self.get_all_articles()
-    #             if not articles:
-    #                 print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
-    #             else:
-    #                 for article in articles:
-    #                     try:
-    #                         news.append(
-    #                             {
-    #                                 "image_url": self.get_image_url(article),
-    #                                 "title": self.get_title(article),
-    #                                 "article_url": self.get_article_url(article),
-    #                                 "summary": self.get_summary(article),
-    #                                 "category": category.value
-    #                             }
-    #                         )
-    #                     except (WebDriverException, AttributeError, Exception) as e:
-    #                         print(f"An error occurred while scraping article on page {pages_to_scrape + 1} of category {category.value}:", e)
-    #             next_page = self.get_next_page_element()
-    #             if next_page.text == NewsButton.NEXT_PAGE.value and pages_to_scrape > 0:
-    #                 self.driver.execute_script("arguments[0].click();", next_page)
-    #             else:
-    #                 break
-    #     return news
-
 
     def get_article_details(self, article_url, image_url, summary, category_value, title):
         # Navigate to the article URL
-        print(article_url)
-        article = self.driver.get(article_url)
-        # image_url = self.get_image_url()
-        # summary = self.get_summary(article)
+        self.driver.get(article_url)
 
-        # title = self.get_title(article)
-        # article_url = self.get_article_url(article)
-        # summary = self.get_summary(article)
-
-        # if not article_url:
-        #     print(f"Invalid URL for article: {title}")
-        #     return None
-
-        # self.driver.get(article_url)
         content = self.driver.find_element(By.ID, 'content-details').text
-        # print(content)
-        # # content = self.wait.until(EC.presence_of_element_located((By.ID, 'content-details'))).text
-
         published_date = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
         author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
 
@@ -320,17 +258,12 @@ class NewsScraper:
                     original_window = self.driver.current_window_handle
 
                     for article in first_articles:
-                                            
-                        # print(article.get_attribute("outerHTML"))
                         try:
                             # Extract all details BEFORE navigating to the article page
                             image_url = self.get_image_url(article)
                             title = self.get_title(article)
                             article_url = self.get_article_url(article)
                             summary = self.get_summary(article)
-
-                            # Now get the article details
-
 
                             # Open a new tab
                             self.driver.execute_script("window.open();")
@@ -363,19 +296,4 @@ class NewsScraper:
                         self.driver.execute_script("arguments[0].click();", next_page)
                     else:
                         break
-        return news
-
-    def collect_news(self) -> list[dict]:
-        news = self.get_article_values()
-        for n in news:
-            try:
-                self.driver.get(n.get('article_url'))
-                content = self.driver.find_element(By.ID, 'content-details').text
-                author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
-                date_published = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
-                n["pulished_date"] = date_published
-                n["author"] = author
-                n["content"] = content
-            except (WebDriverException, AttributeError, Exception) as e:
-                print(f"An error occurred while scraping content page of category {n.get('category')} and url {n.get('article_url')}:: {e}")
         return news
