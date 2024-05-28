@@ -9,6 +9,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import WebDriverException
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from pprint import pprint
 
 class NewsCategory(Enum):
@@ -70,14 +73,18 @@ class NewsScraper:
 
     def initialize_driver(self, category: NewsCategory) -> None:
         category_page_url = f"{self.url}/section/{category.value}/"
+        print("IN INITIAT")
 
         try:
             self.driver.get(category_page_url)
+            print(category_page_url)
         except WebDriverException as e:
             print("Error occurred while navigating to the category page:", e)
             raise
 
+
     def get_all_articles(self) -> list[WebElement]:
+        articles = []
         try:
             self.scroll_to_bottom()
         except WebDriverException as e:
@@ -92,11 +99,12 @@ class NewsScraper:
                 print("Error occurred while waiting for the next page element to load:", e)
                 raise
 
-        try:
-            return self.get_articles_element()
-        except WebDriverException as e:
-            print("Error occurred while retrieving the article elements:", e)
-            raise
+        articles_elements = self.get_articles_element()
+        for article in articles_elements:
+            articles.append(article)
+
+        return articles
+        ...
 
     def get_next_article(self) -> WebElement:
         try:
@@ -187,8 +195,9 @@ class NewsScraper:
 
     def get_article_url(self, article: WebElement) -> str:
         try:
-            title_element = article.find_element(By.CLASS_NAME, 'card-title').find_element(By.TAG_NAME, 'a')
-            return title_element.get_attribute('href')
+            title_element = article.find_element(By.CLASS_NAME, 'card-title')
+            link_element = title_element.find_element(By.TAG_NAME, 'a')
+            return link_element.get_attribute('href')
         except WebDriverException as e:
             print("Error occurred while retrieving the article url of the article:", e)
             return ""
@@ -256,49 +265,99 @@ class NewsScraper:
     #     return news
 
 
+    def get_article_details(self, article_url, image_url, summary, category_value, title):
+        # Navigate to the article URL
+        print(article_url)
+        article = self.driver.get(article_url)
+        # image_url = self.get_image_url()
+        # summary = self.get_summary(article)
+
+        # title = self.get_title(article)
+        # article_url = self.get_article_url(article)
+        # summary = self.get_summary(article)
+
+        # if not article_url:
+        #     print(f"Invalid URL for article: {title}")
+        #     return None
+
+        # self.driver.get(article_url)
+        content = self.driver.find_element(By.ID, 'content-details').text
+        # print(content)
+        # # content = self.wait.until(EC.presence_of_element_located((By.ID, 'content-details'))).text
+
+        published_date = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
+        author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
+
+        return {
+            "image_url": image_url,
+            "title": title,
+            "article_url": article_url,
+            "summary": summary,
+            "category": category_value,
+            # "content": content,
+            "author": author,
+            "source": self.url,
+            "published_date": published_date
+        }
+
     def get_article_values(self) -> list[dict]:
+        """Gets article data from the website."""
+
         news = []
         for category in NewsCategory:
             self.initialize_driver(category)
             pages_to_scrape = self.number_of_pages_to_scrape
+
             while pages_to_scrape > 0:
                 pages_to_scrape -= 1
                 articles = self.get_all_articles()
-
-                first_articles = articles[:1]
+                first_articles = articles[:2]  # Process only the first 5 articles
+                # pprint(first_articles)
 
                 if not articles:
                     print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
                 else:
+                    original_window = self.driver.current_window_handle
+
                     for article in first_articles:
+                                            
+                        # print(article.get_attribute("outerHTML"))
                         try:
+                            # Extract all details BEFORE navigating to the article page
                             image_url = self.get_image_url(article)
                             title = self.get_title(article)
                             article_url = self.get_article_url(article)
                             summary = self.get_summary(article)
-                            category_value = category.value
 
-                            self.driver.get(article_url)
-                            content = self.driver.find_element(By.ID, 'content-details').text
-                            published_date = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
-                            author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
+                            # Now get the article details
 
 
-                            news.append(
-                                {
-                                    "image_url": image_url,
-                                    "title": title,
-                                    "article_url": article_url,
-                                    "summary": summary,
-                                    "category": category_value,
-                                    "content": content,
-                                    "author": author,
-                                    "pulished_date": published_date
-                                }
+                            # Open a new tab
+                            self.driver.execute_script("window.open();")
+
+                            # Switch to the new tab (it's always the last one)
+                            self.driver.switch_to.window(self.driver.window_handles[-1])
+
+                            # Navigate to the article URL
+                            # self.driver.get(article_url)
+
+                            article_details = self.get_article_details(
+                                article_url, image_url, summary, category.value, title
                             )
-                            pprint(news)
-                        except (WebDriverException, AttributeError, Exception) as e:
-                            print(f"An error occurred while scraping article on page {pages_to_scrape + 1} of category {category.value}:", e)
+
+                            # Close the current tab
+                            self.driver.close()
+
+                            # Switch back to the original tab
+                            self.driver.switch_to.window(original_window)
+
+                            # if article_details is not None:
+                            #     news.append(article_details)
+                            print(f"Success: 1")
+                            pprint(article_details)
+                        except Exception as e:
+                            print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
+
                     next_page = self.get_next_page_element()
                     if next_page.text == NewsButton.NEXT_PAGE.value and pages_to_scrape > 0:
                         self.driver.execute_script("arguments[0].click();", next_page)
