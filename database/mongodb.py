@@ -9,6 +9,7 @@ class MongoDB:
         # provide the mongodb atlas url to connect python to mongodb using pymongo
         self.CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING") if connection_string is None else connection_string
         self.MONGO_DB_NAME = os.getenv("MONGO_DB_NAME") if db_name is None else db_name
+        
         self.MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME") if collection_name is None else collection_name
 
         # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
@@ -55,3 +56,10 @@ class MongoDB:
         collection = self.create_collection(collection_name)
 
         return collection.insert_one(content)
+
+    def insert_many_content(self, content: list[dict], collection_name: str = None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
+        # Insert content into MongoDB
+        collection = self.create_collection(collection_name)
+
+        return collection.insert_many(content)

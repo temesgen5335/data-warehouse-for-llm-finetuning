@@ -7,3 +7,4 @@ selenium
 pytest
 fastapi
 uvicorn
+mongomock
