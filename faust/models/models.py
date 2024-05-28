@@ -1,14 +1,13 @@
 # models.py
 import faust
 
-class ScrapedData(faust.Record, serializer='json'):
-    url: str
+class ScrapedNews(faust.Record, serializer='json'):
+    image_url: str
     title: str
+    article_url: str
+    category: str
+    author: str
+    summary: str
+    content: str
     source: str
-
-    def to_dict(self):
-        return {
-            'url': self.url,
-            'title': self.title,
-            'source': self.source,
-        }
+    published_date: str
