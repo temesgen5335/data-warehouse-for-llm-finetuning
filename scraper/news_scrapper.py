@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 import re
 import os
 import subprocess
@@ -13,6 +14,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from pprint import pprint
+
+from kafka import KafkaProducer
+
+KAFKA_TOPIC = 'scraped_news'
+KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'
+producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
 
 class NewsCategory(Enum):
     POLITICS = 'politics'
@@ -232,7 +240,7 @@ class NewsScraper:
             "article_url": article_url,
             "summary": summary,
             "category": category_value,
-            # "content": content,
+            "content": content,
             "author": author,
             "source": self.url,
             "published_date": published_date
@@ -256,6 +264,9 @@ class NewsScraper:
                 article_url, image_url, summary, category.value, title
             )
 
+            # Send the article to a Kafka topic in Kafka, for further processing
+            producer.send(KAFKA_TOPIC, article_details)
+
             # Close the current tab
             self.driver.close()
 
@@ -276,7 +287,7 @@ class NewsScraper:
             while pages_to_scrape > 0:
                 pages_to_scrape -= 1
                 articles = self.get_all_articles()
-                first_articles = articles[:2]
+                first_articles = articles[:5]
 
                 if not articles:
                     print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
@@ -291,3 +302,4 @@ class NewsScraper:
                     else:
                         break
         return news
+
