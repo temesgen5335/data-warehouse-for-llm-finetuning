@@ -65,6 +65,8 @@ services:
 
   faust:
     build: ./faust
+    volumes:
+      - ./faust:/app
     depends_on:
       - kafka
     environment:
