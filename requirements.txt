@@ -4,3 +4,4 @@ python-dotenv
 pymongo
 pandas
 selenium
+pytest
