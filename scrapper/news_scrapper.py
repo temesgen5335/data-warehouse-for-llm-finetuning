@@ -3,10 +3,14 @@ import os
 import subprocess
 import platform
 import re
+import platform
+import re
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -27,15 +31,20 @@ class NewsCategory(Enum):
     SPORT = 'sports'
 
 class NewsButton(Enum):
+class NewsButton(Enum):
     LOADING = "ተጨማሪ ጫን"
     NEXT_PAGE = 'next page'
 
 class NewsCollector:
     def __init__(self, url: str, headless: bool = True, pages_to_scrape: int = 1) -> None:
         self.setup_driver()
+class NewsCollector:
+    def __init__(self, url: str, headless: bool = True, pages_to_scrape: int = 1) -> None:
+        self.setup_driver()
         options = Options()
         if headless:
             options.add_argument("--headless")
+        self.driver = webdriver.Firefox(options=options, service=Service(executable_path=GECKODRIVER_PATH))
         self.driver = webdriver.Firefox(options=options, service=Service(executable_path=GECKODRIVER_PATH))
         self.url = url
         self.pages_to_scrape = pages_to_scrape
@@ -88,6 +97,7 @@ class NewsCollector:
             raise
 
     def get_articles(self) -> list[WebElement]:
+    def get_articles(self) -> list[WebElement]:
         try:
             row_element = self.driver.find_element(By.XPATH, '//div[@class="row loadmore"]')
             articles = row_element.find_elements(By.TAG_NAME, 'article')
@@ -96,12 +106,14 @@ class NewsCollector:
             return []
 
     def get_next_page(self) -> WebElement:
+    def get_next_page(self) -> WebElement:
         try:
             footer_element = self.driver.find_elements(By.TAG_NAME, 'footer')[0]
             return footer_element.find_element(By.TAG_NAME, 'a')
         except WebDriverException as e:
             raise
 
+    def get_image(self, article: WebElement) -> str:
     def get_image(self, article: WebElement) -> str:
         try:
             image_element = article.find_element(By.TAG_NAME, 'img')
@@ -112,12 +124,14 @@ class NewsCollector:
             return ""
 
     def get_headline(self, article: WebElement) -> str:
+    def get_headline(self, article: WebElement) -> str:
         try:
             title_element = article.find_element(By.CLASS_NAME, 'card-title').find_element(By.TAG_NAME, 'a')
             return title_element.text
         except WebDriverException as e:
             return ""
 
+    def get_article_link(self, article: WebElement) -> str:
     def get_article_link(self, article: WebElement) -> str:
         try:
             title_element = article.find_element(By.CLASS_NAME, 'card-title').find_element(By.TAG_NAME, 'a')
@@ -126,12 +140,14 @@ class NewsCollector:
             return ""
 
     def get_summary(self, article: WebElement) -> str:
+    def get_summary(self, article: WebElement) -> str:
         try:
             highlight_element = article.find_element(By.CLASS_NAME, 'card-text')
             return highlight_element.text
         except WebDriverException as e:
             return ""
 
+    def get_publish_time(self, article: WebElement) -> str:
     def get_publish_time(self, article: WebElement) -> str:
         try:
             time_element = article.find_element(By.TAG_NAME, 'time')

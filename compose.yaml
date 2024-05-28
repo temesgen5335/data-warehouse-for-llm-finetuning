@@ -71,6 +71,11 @@ services:
 
     ports:
       - "6068:6066"
+    environment:
+    - KAFKA_BROKER_URL=kafka://kafka:9092
+
+    ports:
+      - "6068:6066"
 
 volumes:
   mongodb_data_container:
