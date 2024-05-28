@@ -262,8 +262,7 @@ class NewsScraper:
             # Switch back to the original tab
             self.driver.switch_to.window(self.driver.window_handles[0])
 
-            print(f"Success: 1")
-            pprint(article_details)
+            return article_details
         except Exception as e:
             print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
         
@@ -283,7 +282,8 @@ class NewsScraper:
                     print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
                 else:
                     for article in first_articles:
-                        self.process_article(article, category, pages_to_scrape)
+                        scraped_news_article = self.process_article(article, category, pages_to_scrape)
+                        pprint(scraped_news_article)
 
                     next_page = self.get_next_page_element()
                     if next_page.text == NewsButton.NEXT_PAGE.value and pages_to_scrape > 0:
