@@ -8,3 +8,5 @@ nltk
 mongomock
 pytest
 kafka-python
+fastapi
+uvicorn
