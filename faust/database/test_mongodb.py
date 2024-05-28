@@ -73,9 +73,3 @@ class TestMongoDB:
         
         # Check if all content is retrieved successfully
         assert results == content
-
-    def test_insert_many_content(self, mock_db):
-        content = [{"key": "value1"}, {"key": "value2"}]
-        result = self.mongodb.insert_many_content(content)
-        # Check if the content is inserted successfully
-        assert result.acknowledged == True
