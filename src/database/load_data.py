@@ -16,6 +16,12 @@ import sys
 
 
 def load_data_to_mongo(csv_file_path, columns_to_rename, source, db_name, collection_name):
+    # Get the absolute path to the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the absolute path to the CSV file
+    csv_file_path = os.path.join(script_dir, csv_file_path)
+
     # Load the CSV file into a pandas DataFrame
     df = pd.read_csv(csv_file_path)
     
@@ -38,7 +44,7 @@ def main():
     def main():
         data_files = [
             {
-                'csv_file_path': '../data/slack/Amharic_News_Dataset.csv',
+                'csv_file_path': '../../data/slack/Amharic_News_Dataset.csv',
                 'columns_to_rename': {
                     'headline': 'title',
                     'date': 'published_date',
@@ -50,7 +56,7 @@ def main():
                 'db_name': 'slack_data',
                 'collection_name': 'amharic_news_data',
             },
-            # Add more dictionaries here for other CSV files
+            # add more dictionaries for other data files to save here
         ]
 
         for data_file in data_files:
