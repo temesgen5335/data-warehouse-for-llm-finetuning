@@ -10,3 +10,4 @@ pytest
 kafka-python
 fastapi
 uvicorn
+pandas
