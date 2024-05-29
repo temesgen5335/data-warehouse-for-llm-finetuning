@@ -25,7 +25,14 @@ class Normalize:
         return self.short_forms.get(short_form, short_form)
 
     def remove_ascii_and_numbers(self, text_input):
+        # Ensure that text_input is a string
+        if not isinstance(text_input, str):
+            text_input = str(text_input)
+
+        # Remove ASCII characters and numbers from text_input
         rm_num_and_ascii = re.sub('[A-Za-z0-9]', '', text_input)
+
+        # Remove specific Unicode characters from rm_num_and_ascii
         return re.sub('[\'\u1369-\u137C\']+', '', rm_num_and_ascii)
 
     def remove_punc_and_special_chars(self, text): 

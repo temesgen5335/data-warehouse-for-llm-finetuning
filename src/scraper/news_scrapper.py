@@ -2,6 +2,8 @@ from enum import Enum
 import json
 import re
 import os
+from dotenv import load_dotenv
+
 import subprocess
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -17,8 +19,11 @@ from pprint import pprint
 
 from kafka import KafkaProducer
 
-KAFKA_TOPIC = 'scraped_news'
-KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'
+# Load environment variables from the .env file
+load_dotenv()
+
+KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'scraping')
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9094')
 producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 
