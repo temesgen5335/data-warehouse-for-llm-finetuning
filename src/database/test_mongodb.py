@@ -95,3 +95,12 @@ class TestMongoDB:
         content.pop('_id', None)
         # Check if the content is retrieved successfully
         assert result == content
+
+    def test_delete_one(self):
+        self.setup_method(None)
+        content = {"key": "value"}
+        self.mongodb.insert_content(content)
+        # Pass a filter that matches the inserted document
+        result = self.mongodb.delete_one(content)
+        # Check if the content is deleted successfully
+        assert result.deleted_count == 1
