@@ -64,9 +64,9 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
 
   faust:
-    build: ./faust
+    build: ./src/faust
     volumes:
-      - ./faust:/app
+      - ./src/faust:/app
     depends_on:
       - kafka
     environment:
@@ -76,9 +76,9 @@ services:
       - "6068:6066"
 
   scraper:
-    build: ./scraper
+    build: ./src/scraper
     volumes:
-      - ./scraper:/app
+      - ./src/scraper:/app
     depends_on:
       - mongodb
       - faust
