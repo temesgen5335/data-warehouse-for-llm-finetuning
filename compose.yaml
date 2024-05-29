@@ -39,27 +39,34 @@ services:
 
   # Kafka and Faust- stream processing
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: zookeeper
+    restart: always
     ports:
       - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+
 
   kafka:
-      image: wurstmeister/kafka:latest
-      ports:
-        - "9092:9092"
-        - "9093:9093"
-      environment:
-        KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
-        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-        KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
-        KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-        KAFKA_CREATE_TOPICS: "my-topic:1:1"
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+      - '9094:9094'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@<your_host>:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
 
   faust:
-    build: ./faust
+    build: ./src/faust
+    volumes:
+      - ./src/faust:/app
     depends_on:
       - kafka
     environment:
@@ -67,6 +74,14 @@ services:
 
     ports:
       - "6068:6066"
+
+  scraper:
+    build: ./src/scraper
+    volumes:
+      - ./src/scraper:/app
+    depends_on:
+      - mongodb
+      - faust
 
 volumes:
   mongodb_data_container:

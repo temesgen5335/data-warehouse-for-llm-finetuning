@@ -6,6 +6,7 @@ logs
 
 geckodriver
 geckodriver*
+chromedriver*
 
 # Airflow configuration
 airflow.cfg

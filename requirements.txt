@@ -4,7 +4,9 @@ python-dotenv
 pymongo
 pandas
 selenium
+nltk
+mongomock
 pytest
+kafka-python
 fastapi
 uvicorn
-mongomock
