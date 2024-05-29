@@ -19,15 +19,13 @@ from data_cleaning.article_processor import ArticleProcessor
 from dotenv import load_dotenv
 
 KAFKA_BROKER_URL = os.getenv('KAFKA_BROKER_URL', 'kafka://localhost:9094')
-MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING', 'mongodb://localhost:27017/')
+MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING', 'mongodb://mongodb:27017/')
 
 app = faust.App('myapp', broker=KAFKA_BROKER_URL)
 scraped_data_topic = app.topic('scraping', value_type=ScrapedNews)
 
 # create a MongoDB instance (for saving the data after processing)
-mongodb = MongoDB('alain_news', 'scraped_data', MONGODB_CONNECTION_STRING)
-
-
+mongodb = MongoDB(db_name="clean_data", collection_name="alain_news_cleaned_data", connection_string="mongodb://localhost:27018/")
 
 @app.agent(scraped_data_topic)
 async def save_raw_news(scraped_data):
@@ -46,7 +44,7 @@ async def save_raw_news(scraped_data):
       # Check if processed_data is not None before saving it to MongoDB
       if processed_data is not None:
         # Save the processed data to MongoDB
-        # mongodb.insert_content(processed_data)
+        mongodb.insert_content(processed_data)
 
         print(type(processed_data))
         print(processed_data.get("article_url"))
