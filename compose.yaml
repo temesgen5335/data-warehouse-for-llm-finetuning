@@ -7,5 +7,97 @@ services:
     volumes:
       - mongodb_data_container:/data/db
 
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+
+  mongodb_exporter:
+    image: bitnami/mongodb-exporter
+    container_name: mongodb_exporter
+    ports:
+      - "9216:9216"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+    restart: unless-stopped
+
+  # Kafka and Faust- stream processing
+  zookeeper:
+    image: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+      - '9094:9094'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@<your_host>:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
+  faust:
+    build: ./src/faust
+    volumes:
+      - ./src/faust:/app
+    depends_on:
+      - kafka
+    environment:
+    - KAFKA_BROKER_URL=kafka://kafka:9092
+
+    ports:
+      - "6068:6066"
+
+  faust_save_news:
+    build: 
+      context: ./src/faust
+      dockerfile: Dockerfile.save_raw_news
+    volumes:
+      - ./src/faust:/app
+    depends_on:
+      - kafka
+    environment:
+    - KAFKA_BROKER_URL=kafka://kafka:9092
+
+    ports:
+      - "6069:6066"
+
+  scraper:
+    build: ./src/scraper
+    volumes:
+      - ./src/scraper:/app
+    depends_on:
+      - mongodb
+      - faust
+
 volumes:
   mongodb_data_container:
+  grafana-storage:
+  prom_data:

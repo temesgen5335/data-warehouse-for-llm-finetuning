@@ -1,6 +1,12 @@
 /data/
 
+data
+
 logs
+
+geckodriver
+geckodriver*
+chromedriver*
 
 # Airflow configuration
 airflow.cfg
@@ -120,6 +126,8 @@ celerybeat-schedule
 .venv*
 venv*
 ENV/
+#beautifulSoup virtualenv
+webenv
 
 # Spyder project settings
 .spyderproject
