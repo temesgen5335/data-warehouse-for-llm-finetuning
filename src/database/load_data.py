@@ -24,10 +24,13 @@ def load_data_to_mongo():
         'date': 'published_date',
         'article': 'content',
         'category': 'category',
-        'link': 'article_url'
+        'link': 'article_url',
     }
 
     df.rename(columns=columns_to_rename, inplace=True)
+
+    # Add source column and set it to 'slack'
+    df['source'] = 'slack'
 
     # Create a MongoDB object
     mongodb = MongoDB(collection_name='amharic_news_data', db_name='slack_data')
@@ -39,7 +42,10 @@ def load_data_to_mongo():
 
 def main():
     # load_data_to_mongo()
+    print("Loading data...")
     load_data_to_mongo()
+
+    print("Data loaded successfully!")
 
 if __name__ == '__main__':
     main()
