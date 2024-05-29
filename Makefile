@@ -1,4 +1,4 @@
-.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow build_faust build_scraper up_scraper
+.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow build_faust build_scraper up_scraper up_faust_save_news build_faust_save_news
 
 up:
 	make up_without_faust
@@ -19,6 +19,13 @@ up_faust:
 
 build_faust:
 	docker compose -f compose.yaml build faust
+
+build_faust_save_news:
+	docker compose -f compose.yaml build faust_save_news
+
+up_faust_save_news:
+	make build_faust_save_news
+	docker compose -f compose.yaml up -d faust_save_news
 
 start_airflow:
 	mkdir -p ./dags ./logs ./plugins ./config
