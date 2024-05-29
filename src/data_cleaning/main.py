@@ -14,16 +14,18 @@ from article_processor import ArticleProcessor
 
 
 
-archive_db = MongoDB(db_name='archive', collection_name='archive_data')
-cleaned_data_collection = MongoDB(db_name='clean_data', collection_name='slack_cleaned_data')
-slack_original_data = MongoDB(db_name='slack_data', collection_name='amharic_news_data')
+archive_db = MongoDB(db_name='archive', collection_name='kaggle_amharic_corpus')
+cleaned_data_collection = MongoDB(db_name='clean_data', collection_name='kaggle_amharic_corpus_cleaned')
+
+# The collection with unclean data
+original_data_collection = MongoDB(db_name='kaggle_data', collection_name='amharic_corpus_merged')
 
 
 def main():
     text = "ጽኑ ህክምና የሚያስፈልጋ ቸው ሲሆኑ፤ ከዚህ ውስጥ ከ40 እስከ"
-    columns_to_process = ['title']  # Add other columns to process here
+    columns_to_process = ['content']  # Add other columns to process here
 
-    processor = ArticleProcessor(slack_original_data, cleaned_data_collection, archive_db, columns_to_process)
+    processor = ArticleProcessor(original_data_collection, cleaned_data_collection, archive_db, columns_to_process)
     processor.process_all_articles_in_collection()
 
 if __name__ == '__main__':
