@@ -4,8 +4,8 @@ up:
 	make up_without_faust
 	make up_faust
 	make up_scraper
-	make start_airflow
-	make serve
+	# make start_airflow
+	# make serve
 
 airflow_init:
 	docker compose -f docker-compose_airflow.yaml up airflow-init
