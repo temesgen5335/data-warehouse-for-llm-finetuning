@@ -84,3 +84,14 @@ class TestMongoDB:
         result = self.mongodb.insert_many_content(content)
         # Check if the content is inserted successfully
         assert result.acknowledged == True
+
+    def test_find_one(self):
+        self.setup_method(None)
+        content = {"key": "value"}
+        self.mongodb.insert_content(content)
+        result = self.mongodb.find_one()
+        # Remove the '_id' field from the result and content before comparing
+        result.pop('_id', None)
+        content.pop('_id', None)
+        # Check if the content is retrieved successfully
+        assert result == content

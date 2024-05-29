@@ -15,6 +15,7 @@ class MongoDB:
         self.client = MongoClient(self.CONNECTION_STRING) if client is None else client
         self.db = self.client[self.MONGO_DB_NAME]
         self.collection = self.db[self.MONGO_COLLECTION_NAME]
+        print(self.CONNECTION_STRING)
 
     def get_database(self):
         # Create the database
@@ -62,3 +63,6 @@ class MongoDB:
         collection = self.create_collection(collection_name)
 
         return collection.insert_many(content)
+    
+    def find_one(self, filter_col=None):
+        return self.collection.find_one(filter_col)
