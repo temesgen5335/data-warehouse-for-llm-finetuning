@@ -8,6 +8,8 @@ geckodriver
 geckodriver*
 chromedriver*
 
+processed_files.log
+
 # Airflow configuration
 airflow.cfg
 airflow_login.py
