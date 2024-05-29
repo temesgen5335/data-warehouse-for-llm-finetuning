@@ -2,7 +2,7 @@ import faust
 import os
 import sys
 
-from database import MongoDB
+
 
 from datetime import datetime
 from models import ScrapedNews
@@ -10,6 +10,7 @@ from models import ScrapedNews
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # os.chdir("../")
+from database import MongoDB
 
 print(os.getcwd())
 
@@ -30,7 +31,7 @@ mongodb = MongoDB(db_name="clean_data", collection_name="alain_news_cleaned_data
 @app.agent(scraped_data_topic)
 async def save_raw_news(scraped_data):
   # Initialize the ArticleProcessor
-  processor = ArticleProcessor(columns_to_process=['article_url'])
+  processor = ArticleProcessor(cleaned_collection=mongodb, columns_to_process=['article_url'])
 
   async for data in scraped_data:
     # Convert the data to a dictionary
@@ -44,7 +45,7 @@ async def save_raw_news(scraped_data):
       # Check if processed_data is not None before saving it to MongoDB
       if processed_data is not None:
         # Save the processed data to MongoDB
-        mongodb.insert_content(processed_data)
+        # mongodb.insert_content(processed_data)
 
         print(type(processed_data))
         print(processed_data.get("article_url"))
