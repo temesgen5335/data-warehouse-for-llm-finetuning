@@ -16,6 +16,8 @@ from article_processor import ArticleProcessor
 
 archive_db = MongoDB(db_name='archive', collection_name='kaggle_amharic_corpus')
 cleaned_data_collection = MongoDB(db_name='clean_data', collection_name='kaggle_amharic_corpus_cleaned')
+
+# The collection with unclean data
 original_data_collection = MongoDB(db_name='kaggle_data', collection_name='amharic_corpus_merged')
 
 
