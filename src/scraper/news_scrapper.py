@@ -19,6 +19,10 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import time
 import platform
+# import logging
+# import sys
+# 
+# logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 GECKODRIVER_VERSION = '0.34.0'
@@ -27,7 +31,7 @@ PLATFORM_ARCHITECTURE = platform.machine()
 GECKODRIVER_FOLDER = './geckodriver'
 
 
-KAFKA_TOPIC = 'scrap'
+KAFKA_TOPIC = 'scraping'
 KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'
 MAX_RETRIES = 5
 RETRY_DELAY = 2  # delay between retries in seconds
@@ -47,10 +51,10 @@ for i in range(MAX_RETRIES):
 
 class NewsCategory(Enum):
     POLITICS = 'politics'
-    SOCIAL = 'social'
-    ECONOMY = 'economy'
-    VARIETIES = 'varities'
-    SPORT = 'sports'
+    # SOCIAL = 'social'
+    # ECONOMY = 'economy'
+    # VARIETIES = 'varities'
+    # SPORT = 'sports'
 
 
 
@@ -104,7 +108,6 @@ class NewsScraper:
         except WebDriverException as e:
             print("Error occurred while navigating to the category page:", e)
             raise
-
 
 
     def get_all_articles(self) -> list[WebElement]:
@@ -295,9 +298,12 @@ class NewsScraper:
             print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
 
 
+
     def scrape_news(self) -> list[dict]:
+        print("Scraping News Started!!")
         news = []
         for category in NewsCategory:
+            print(category.value)
             # Read the last scraped page number from a file
             try:
                 with open(f'{category.value}_last_page.txt', 'r') as f:
@@ -305,11 +311,18 @@ class NewsScraper:
             except (FileNotFoundError, ValueError):
                 start_page = 0
 
-            pages_to_scrape = self.number_of_pages_to_scrape - start_page
+            # Check if the number of pages to scrape has already been reached
+            if start_page >= self.number_of_pages_to_scrape:
+                print(f"Already scraped {self.number_of_pages_to_scrape} pages for category {category.value}")
+                continue
 
+            pages_to_scrape = self.number_of_pages_to_scrape - start_page
+            
             while pages_to_scrape > 0:
                 pages_to_scrape -= 1
                 start_page += 1  # Increment the page number
+                print("START PAGE: ", start_page)
+                print("PAGE TO SCRAPE: ", pages_to_scrape)
 
                 # Modify the URL based on the current page number
                 url = f'https://am.al-ain.com/section/{category.value}/page-{start_page}.html'
@@ -318,10 +331,13 @@ class NewsScraper:
 
                 articles = self.get_all_articles()
 
+                first_articles = articles[:2]
+
                 if not articles:
                     print(f"No articles found on page {start_page} of category {category.value}")
+                    break
                 else:
-                    for article in articles:
+                    for article in first_articles:
                         scraped_news_article = self.process_article(article, category, start_page - 1)
                         print(f"Success: {scraped_news_article.get('article_url')}")
 
