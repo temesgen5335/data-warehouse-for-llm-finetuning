@@ -68,3 +68,8 @@ class MongoDB:
     
     def delete_one(self, filter_col=None):
         return self.collection.delete_one(filter_col)
+    
+    def find(self, filter_col=None, collection_name=None):
+        collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
+        collection = self.create_collection(collection_name)
+        return collection.find(filter_col)

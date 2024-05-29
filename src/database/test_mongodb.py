@@ -104,3 +104,18 @@ class TestMongoDB:
         result = self.mongodb.delete_one(content)
         # Check if the content is deleted successfully
         assert result.deleted_count == 1
+
+    def test_find(self):
+        self.setup_method(None)
+        content = [{"key": "value1"}, {"key": "value2"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        results = list(self.mongodb.find())
+        # Remove the '_id' field from the results and content before comparing
+        for r in results:
+            r.pop('_id', None)
+        for c in content:
+            c.pop('_id', None)
+        
+        # Check if all content is retrieved successfully
+        assert results == content
