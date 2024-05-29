@@ -75,6 +75,20 @@ services:
     ports:
       - "6068:6066"
 
+  faust_save_news:
+    build: 
+      context: ./src/faust
+      dockerfile: Dockerfile.save_raw_news
+    volumes:
+      - ./src/faust:/app
+    depends_on:
+      - kafka
+    environment:
+    - KAFKA_BROKER_URL=kafka://kafka:9092
+
+    ports:
+      - "6069:6066"
+
   scraper:
     build: ./src/scraper
     volumes:
