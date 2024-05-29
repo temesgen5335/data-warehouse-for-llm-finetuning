@@ -39,31 +39,47 @@ def load_data_to_mongo(csv_file_path, columns_to_rename, source, db_name, collec
 
     print(f"Data from {csv_file_path} loaded successfully!")
 
+    # Write the name of the processed file to the log file
+    with open('processed_files.log', 'a') as f:
+        f.write(csv_file_path + '\n')
+
+    # Return the absolute path of the CSV file
+    return csv_file_path
 
 def main():
-    def main():
-        data_files = [
-            {
-                'csv_file_path': '../../data/slack/Amharic_News_Dataset.csv',
-                'columns_to_rename': {
-                    'headline': 'title',
-                    'date': 'published_date',
-                    'article': 'content',
-                    'category': 'category',
-                    'link': 'article_url',
-                },
-                'source': 'slack',
-                'db_name': 'slack_data',
-                'collection_name': 'amharic_news_data',
-            },
-            # add more dictionaries for other data files to save here
-        ]
+    # Load the names of the processed files into a set
+    with open('processed_files.log', 'a+') as f:
+        f.seek(0)
+        processed_files = set(line.strip() for line in f)
 
-        for data_file in data_files:
-            load_data_to_mongo(**data_file)
-        
-    if __name__ == '__main__':
-        main()
+
+    data_files = [
+        {
+            'csv_file_path': '../../data/slack/Amharic_News_Dataset.csv',
+            'columns_to_rename': {
+                'headline': 'title',
+                'date': 'published_date',
+                'article': 'content',
+                'category': 'category',
+                'link': 'article_url',
+            },
+            'source': 'slack',
+            'db_name': 'slack_data',
+            'collection_name': 'amharic_news_data',
+        },
+        # add more dictionaries for other data files to save here
+    ]
+
+    for data_file in data_files:
+        # Get the absolute path of the CSV file
+        csv_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), data_file['csv_file_path'])
+
+        # Skip the file if it has already been processed
+        if csv_file_path in processed_files:
+            print(f"Skipping {csv_file_path} (already processed)")
+            continue
+
+        load_data_to_mongo(**data_file)
 
 if __name__ == '__main__':
     main()
