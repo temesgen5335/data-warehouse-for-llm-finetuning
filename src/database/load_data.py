@@ -67,6 +67,15 @@ def main():
             'db_name': 'slack_data',
             'collection_name': 'amharic_news_data',
         },
+        {
+            'csv_file_path': '../../data/kaggle/Amharic_corpus_merged_2023-04-16.csv',
+            'columns_to_rename': {
+                'article': 'content'
+            },
+            'source': 'kaggle',
+            'db_name': 'kaggle_data',
+            'collection_name': 'amharic_corpus_merged',
+        }
         # add more dictionaries for other data files to save here
     ]
 
