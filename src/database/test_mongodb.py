@@ -2,12 +2,8 @@ import pytest
 from pymongo.errors import DuplicateKeyError
 from mongomock import MongoClient
 
-import os
-
-os.chdir('../')
-
 # import the MongoDB class from the database.mongodb module
-from database.mongodb import MongoDB
+from src.database import MongoDB
 
 # In your tests
 class TestMongoDB:
