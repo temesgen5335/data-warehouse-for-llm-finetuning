@@ -10,6 +10,8 @@ chromedriver*
 
 processed_files.log
 
+*last_page.txt
+
 # Airflow configuration
 airflow.cfg
 airflow_login.py

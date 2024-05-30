@@ -8,7 +8,7 @@ WORKDIR /app
 ADD . /app
 
 # Update the system and install Firefox
-RUN apt-get update && apt-get install -y firefox-esr entr
+RUN apt-get update && apt-get install -y firefox-esr entr wget
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

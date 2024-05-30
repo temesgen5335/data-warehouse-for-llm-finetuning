@@ -2,15 +2,16 @@ from enum import Enum
 import json
 import re
 import os
-from dotenv import load_dotenv
-
 import subprocess
+import time
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import NoSuchElementException
+
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,21 +19,46 @@ from selenium.webdriver.support import expected_conditions as EC
 from pprint import pprint
 
 from kafka import KafkaProducer
+from kafka.errors import NoBrokersAvailable
+import time
+import platform
+# import logging
+# import sys
+# 
+# logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-# Load environment variables from the .env file
-load_dotenv()
 
-KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'scraping')
-KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9094')
-producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+GECKODRIVER_VERSION = '0.34.0'
+GECKODRIVER_PATH = './geckodriver'
+PLATFORM_ARCHITECTURE = platform.machine()
+GECKODRIVER_FOLDER = './geckodriver'
 
+
+KAFKA_TOPIC = 'scraping'
+KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'
+MAX_RETRIES = 5
+RETRY_DELAY = 2  # delay between retries in seconds
+
+producer = None
+for i in range(MAX_RETRIES):
+    try:
+        producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+        # If the initialization is successful, break from the loop
+        break
+    except NoBrokersAvailable as e:
+        print(f"An error occurred: {e}")
+        if i < MAX_RETRIES - 1:  # No need to sleep on the last iteration
+            time.sleep(RETRY_DELAY)
+        else:
+            raise  # Re-raise the last exception if all retries failed
 
 class NewsCategory(Enum):
     POLITICS = 'politics'
-    # SOCIAL = 'social'
-    # ECONOMY = 'economy'
-    # VARIETIES = 'varities'
-    # SPORT = 'sports'
+    SOCIAL = 'social'
+    ECONOMY = 'economy'
+    VARIETIES = 'varities'
+    SPORT = 'sports'
+
 
 
 class NewsButton(Enum):
@@ -41,40 +67,33 @@ class NewsButton(Enum):
 
 
 class NewsScraper:
-    def __init__(
-            self,
-            url: str,
-            headless: bool = True,
-            number_of_pages_to_scrape: int = 1
-    ) -> None:
-        self.setup_geckodriver()
+    def __init__(self, url: str, headless: bool = True, number_of_pages_to_scrape: int = 2) -> None:
+        self.setup_driver()
         options = Options()
         if headless:
             options.add_argument("--headless")
-        self.driver = webdriver.Firefox(
-            options=options,
-            service=Service(executable_path='./geckodriver')
-        )
+        self.driver = webdriver.Firefox(options=options, service=Service(executable_path=GECKODRIVER_PATH))
         self.url = url
         self.number_of_pages_to_scrape = number_of_pages_to_scrape
 
+    # TODO - Add error handling
+    def setup_driver(self, version=GECKODRIVER_VERSION):
+            if not os.path.exists(GECKODRIVER_PATH):
+                PLATFORM_ARCHITECTURE = platform.machine()
 
-    def setup_geckodriver(self, version='0.34.0'):
-        if not os.path.exists('./geckodriver'):
-            download = subprocess.run(['wget', '-q',
-                                       f'https://github.com/mozilla/geckodriver/releases/download/v{version}/geckodriver-v{version}-linux-aarch64.tar.gz'])
-            if download.returncode != 0:
-                print("Failed to download geckodriver")
-                return
-            extract = subprocess.run(['tar', '-xzf', f'geckodriver-v{version}-linux-aarch64.tar.gz'])
-            if extract.returncode != 0:
-                print("Failed to extract geckodriver")
-                return
-            subprocess.run(['rm', f'geckodriver-v{version}-linux-aarch64.tar.gz'])
-            chmod = subprocess.run(['chmod', '+x', './geckodriver'])
-            if chmod.returncode != 0:
-                print("Failed to change permissions of geckodriver")
+                if PLATFORM_ARCHITECTURE == 'aarch64':
+                    geckofile_type = 'linux-aarch64'
+                elif PLATFORM_ARCHITECTURE == 'x86_64':
+                    geckofile_type = 'linux64'
+                else:
+                    raise ValueError(f'Unsupported architecture: {PLATFORM_ARCHITECTURE}')
 
+                subprocess.run(['wget', '-q', f'https://github.com/mozilla/geckodriver/releases/download/v{version}/geckodriver-v{version}-{geckofile_type}.tar.gz'])
+                GECKODRIVER_TAR_FILE_PATH = f'./geckodriver-v{version}-{geckofile_type}.tar.gz'
+
+                subprocess.run(['tar', '-xzf', GECKODRIVER_TAR_FILE_PATH])
+                subprocess.run(['rm', GECKODRIVER_TAR_FILE_PATH])
+                subprocess.run(['chmod', '+x', GECKODRIVER_PATH])
 
 
     def scroll_to_bottom(self) -> None:
@@ -84,9 +103,7 @@ class NewsScraper:
             print("Error occurred while scrolling to the bottom of the page:", e)
             raise
 
-    def initialize_driver(self, category: NewsCategory) -> None:
-        category_page_url = f"{self.url}/section/{category.value}/"
-        print("IN INITIAT")
+    def initialize_driver(self, category_page_url) -> None:
 
         try:
             self.driver.get(category_page_url)
@@ -96,27 +113,13 @@ class NewsScraper:
             raise
 
 
-    def get_all_articles(self) -> list[WebElement]:
-        articles = []
+    def get_all_articles(self):
         try:
-            self.scroll_to_bottom()
+            articles_elements = self.get_articles_element()
+            return articles_elements
         except WebDriverException as e:
-            print("Error occurred while scrolling to the bottom of the page:", e)
+            print("Error occurred while retrieving the article elements:", e)
             raise
-
-        next_page = self.get_next_page_element()
-        while next_page.text == NewsButton.LOADING.value:
-            try:
-                next_page = self.get_next_page_element()
-            except WebDriverException as e:
-                print("Error occurred while waiting for the next page element to load:", e)
-                raise
-
-        articles_elements = self.get_articles_element()
-        for article in articles_elements:
-            articles.append(article)
-
-        return articles
         ...
 
     def get_next_article(self) -> WebElement:
@@ -194,8 +197,10 @@ class NewsScraper:
             image_url = image_element.get_attribute('srcset')
             image_url = re.sub(r'\s\d+w', '', image_url).split(',')[0]
             return image_url.strip()
+        except NoSuchElementException:
+            return ""
         except WebDriverException as e:
-            print("Error occurred while retrieving the image url of the article:", e)
+            print(f"Error occurred while retrieving the image url of the article at {article.get('article_url')}: {str(e)}")
             return ""
 
     def get_title(self, article: WebElement) -> str:
@@ -230,12 +235,29 @@ class NewsScraper:
         except WebDriverException as e:
             print("Error occurred while retrieving the time publish of the article:", e)
             return ""
+        
+    def get_content_details(self):
+        try:
+            # Try to locate the element by id
+            details_element = self.driver.find_element(By.ID, "content-details")
+        except NoSuchElementException:
+            try:
+                # If locating the element by id fails, try to locate it by class name
+                details_element = self.driver.find_element(By.CLASS_NAME, "details")
+            except NoSuchElementException:
+                print("Neither 'content-details' id nor 'details' class were found")
+                return ""
+        except Exception as e:
+            print(f"An error occurred while locating the details element: {str(e)}")
+            return ""
+
+        return details_element.text
 
     def get_article_details(self, article_url, image_url, summary, category_value, title):
         # Navigate to the article URL
         self.driver.get(article_url)
 
-        content = self.driver.find_element(By.ID, 'content-details').text
+        content = self.get_content_details()
         published_date = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
         author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
 
@@ -271,6 +293,7 @@ class NewsScraper:
 
             # Send the article to a Kafka topic in Kafka, for further processing
             producer.send(KAFKA_TOPIC, article_details)
+            print(f"Sent article to Kafka: {article_details.get('article_url')}")
 
             # Close the current tab
             self.driver.close()
@@ -281,30 +304,82 @@ class NewsScraper:
             return article_details
         except Exception as e:
             print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
-        
 
-    def scrape_news(self) -> list[dict]:
-        news = []
-        for category in NewsCategory:
-            self.initialize_driver(category)
-            pages_to_scrape = self.number_of_pages_to_scrape
 
-            while pages_to_scrape > 0:
-                pages_to_scrape -= 1
+    def read_last_scraped_page(self, category) -> int:
+        try:
+            with open(f'{category.value}_last_page.txt', 'r') as f:
+                return int(f.read().strip())
+        except (FileNotFoundError, ValueError):
+            return 0
+
+    def write_last_scraped_page(self, category, page_number):
+        with open(f'{category.value}_last_page.txt', 'w') as f:
+            f.write(str(page_number))
+
+    def process_page(self, category, start_page):
+        url = f'https://am.al-ain.com/section/{category.value}/page-{start_page}.html'
+        self.initialize_driver(url)
+        print("DRIVER INITIALIZED")
+
+        from selenium.common.exceptions import NoSuchElementException
+        successfully_scraped_urls = set()
+
+        for i in range(3):  # Retry up to three times for the page
+            try:
                 articles = self.get_all_articles()
-                first_articles = articles[:5]
-
                 if not articles:
-                    print(f"No articles found on page {pages_to_scrape + 1} of category {category.value}")
+                    print(f"No articles found on page {start_page} of category {category.value}")
+                    break
                 else:
-                    for article in first_articles:
-                        scraped_news_article = self.process_article(article, category, pages_to_scrape)
-                        pprint(scraped_news_article)
+                    for article in articles:
+                        article_url = self.get_article_url(article)
+                        if article_url in successfully_scraped_urls:
+                            continue  # Skip this article if it has already been successfully scraped
 
-                    next_page = self.get_next_page_element()
-                    if next_page.text == NewsButton.NEXT_PAGE.value and pages_to_scrape > 0:
-                        self.driver.execute_script("arguments[0].click();", next_page)
-                    else:
-                        break
-        return news
+                        for j in range(3):  # Retry up to three times for each article
+                            try:
+                                if article is not None and isinstance(article, WebElement):
+                                    scraped_news_article = self.process_article(article, category, start_page - 1)
+                                    print(f"Success: {scraped_news_article.get('article_url')}")
+                                    successfully_scraped_urls.add(article_url)  # Add the URL of the successfully scraped article to the set
+                                    break  # If the article was processed successfully, break out of the retry loop
+                                else:
+                                    print(f"Article on page {start_page} of category {category.value} is not an article WebElement")
+                            except NoSuchElementException:
+                                print("An error occurred while processing the article. Refreshing the article...")
+                                self.driver.get(article_url)  # Navigate to the article's URL to refresh it
+                                time.sleep(1)  # Wait for 1 second to allow the page to load
+                                continue  # If a NoSuchElementException was raised, continue with the next retry
+                            except Exception as e:
+                                print(f"An error occurred while processing article on page {start_page} of category {category.value}: {str(e)}")
+                                self.driver.get(article_url)  # Navigate to the article's URL to refresh it
+                                time.sleep(1)  # Wait for 1 second to allow the page to load
+                                continue  # If another exception was raised, continue with the next retry
+            except NoSuchElementException:
+                print("An error occurred while processing the page. Refreshing the page...")
+                self.driver.refresh()
+                continue  # If a NoSuchElementException was raised, continue with the next retry
+            except Exception as e:
+                print(f"An error occurred while processing page {start_page} of category {category.value}: {str(e)}")
+                self.driver.refresh()
+                continue  # If another exception was raised, continue with the next retry
+            
+    def scrape_news(self) -> list[dict]:
+        print("Scraping News Started!!")
+        news = []
+        for page in range(1, self.number_of_pages_to_scrape + 1):
+            print(f"Processing page {page}")
+            for category in NewsCategory:
+                print(category.value)
+                last_scraped_page = self.read_last_scraped_page(category)
 
+                # Check if this page has already been scraped for this category
+                if page <= last_scraped_page:
+                    print(f"Already scraped page {page} for category {category.value}")
+                    continue
+
+                self.process_page(category, page)
+
+                # Write the last scraped page number to a file
+                self.write_last_scraped_page(category, page)
