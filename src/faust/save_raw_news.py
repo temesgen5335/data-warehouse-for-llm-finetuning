@@ -26,12 +26,12 @@ app = faust.App('myapp', broker=KAFKA_BROKER_URL)
 scraped_data_topic = app.topic('scraping', value_type=ScrapedNews)
 
 # create a MongoDB instance (for saving the data after processing)
-mongodb = MongoDB(db_name="clean_data", collection_name="alain_news_cleaned_data", connection_string="mongodb://localhost:27018/")
+mongodb = MongoDB(db_name="clean_data", collection_name="alain_news_clean", connection_string="mongodb://localhost:27018/")
 
 @app.agent(scraped_data_topic)
 async def save_raw_news(scraped_data):
   # Initialize the ArticleProcessor
-  processor = ArticleProcessor(cleaned_collection=mongodb, columns_to_process=['article_url'])
+  processor = ArticleProcessor(cleaned_collection=mongodb, columns_to_process=['content', 'title', 'summary'])
 
   async for data in scraped_data:
     # Convert the data to a dictionary
