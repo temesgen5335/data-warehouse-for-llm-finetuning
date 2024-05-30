@@ -22,6 +22,20 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import time
 import platform
+
+from rich.console import Console
+from rich.table import Table
+from rich.theme import Theme
+
+# Create a logging custom theme
+custom_theme = Theme({
+    "success": "green",
+    "info": "spring_green4"
+})
+
+# initialize the console with the custom theme
+console = Console(theme=custom_theme, force_terminal=True)
+
 # import logging
 # import sys
 # 
@@ -44,6 +58,7 @@ for i in range(MAX_RETRIES):
     try:
         producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
         # If the initialization is successful, break from the loop
+        console.print(f"[success]Kafka producer initialized successfully[/success]")
         break
     except NoBrokersAvailable as e:
         print(f"An error occurred: {e}")
@@ -293,7 +308,7 @@ class NewsScraper:
 
             # Send the article to a Kafka topic in Kafka, for further processing
             producer.send(KAFKA_TOPIC, article_details)
-            print(f"Sent article to Kafka: {article_details.get('article_url')}")
+            console.print("[info]Sent article to Kafka[/info]")
 
             # Close the current tab
             self.driver.close()
@@ -341,7 +356,8 @@ class NewsScraper:
                             try:
                                 if article is not None and isinstance(article, WebElement):
                                     scraped_news_article = self.process_article(article, category, start_page - 1)
-                                    print(f"Success: {scraped_news_article.get('article_url')}")
+                                    console.print(f"[success]Success[/success]: {scraped_news_article.get('article_url')}")
+                                    # print(f"Success: {scraped_news_article.get('article_url')}")
                                     successfully_scraped_urls.add(article_url)  # Add the URL of the successfully scraped article to the set
                                     break  # If the article was processed successfully, break out of the retry loop
                                 else:
