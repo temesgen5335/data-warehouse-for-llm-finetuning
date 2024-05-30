@@ -3,12 +3,15 @@ import json
 import re
 import os
 import subprocess
+import time
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import NoSuchElementException
+
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -51,10 +54,10 @@ for i in range(MAX_RETRIES):
 
 class NewsCategory(Enum):
     POLITICS = 'politics'
-    # SOCIAL = 'social'
-    # ECONOMY = 'economy'
-    # VARIETIES = 'varities'
-    # SPORT = 'sports'
+    SOCIAL = 'social'
+    ECONOMY = 'economy'
+    VARIETIES = 'varities'
+    SPORT = 'sports'
 
 
 
@@ -110,27 +113,13 @@ class NewsScraper:
             raise
 
 
-    def get_all_articles(self) -> list[WebElement]:
-        articles = []
+    def get_all_articles(self):
         try:
-            self.scroll_to_bottom()
+            articles_elements = self.get_articles_element()
+            return articles_elements
         except WebDriverException as e:
-            print("Error occurred while scrolling to the bottom of the page:", e)
+            print("Error occurred while retrieving the article elements:", e)
             raise
-
-        next_page = self.get_next_page_element()
-        while next_page.text == NewsButton.LOADING.value:
-            try:
-                next_page = self.get_next_page_element()
-            except WebDriverException as e:
-                print("Error occurred while waiting for the next page element to load:", e)
-                raise
-
-        articles_elements = self.get_articles_element()
-        for article in articles_elements:
-            articles.append(article)
-
-        return articles
         ...
 
     def get_next_article(self) -> WebElement:
@@ -209,7 +198,7 @@ class NewsScraper:
             image_url = re.sub(r'\s\d+w', '', image_url).split(',')[0]
             return image_url.strip()
         except WebDriverException as e:
-            print("Error occurred while retrieving the image url of the article:", e)
+            print(f"Error occurred while retrieving the image url of the article at {article.get('article_url')}: {str(e)}")
             return ""
 
     def get_title(self, article: WebElement) -> str:
@@ -298,7 +287,6 @@ class NewsScraper:
             print(f"An error occurred while processing article on page {pages_to_scrape + 1} of category {category.value}: {e}")
 
 
-
     def scrape_news(self) -> list[dict]:
         print("Scraping News Started!!")
         news = []
@@ -329,19 +317,58 @@ class NewsScraper:
                 self.initialize_driver(url)
                 print("DRIVER INITIALIZED")
 
-                articles = self.get_all_articles()
+                # articles = self.get_all_articles()
 
                 first_articles = articles[:2]
+                
+                # TESTING
+#                 for article in first_articles:
+#                     if article is not None and isinstance(article, WebElement):
+#                         scraped_news_article = self.process_article(article, category, start_page - 1)
+#                         article_url = self.get_article_url(article)
+#                         print(article_url)
+#                         print(scraped_news_article)
+#                     else :
+#                         print(f"Article on page {start_page} of category {category.value} is not an article WebElement")
 
-                if not articles:
-                    print(f"No articles found on page {start_page} of category {category.value}")
-                    break
-                else:
-                    for article in first_articles:
-                        scraped_news_article = self.process_article(article, category, start_page - 1)
-                        print(f"Success: {scraped_news_article.get('article_url')}")
+#                     # article_url = self.get_article_url(article)
+#                     # print(article_url)
+#                     # print(scraped_news_article)
+# a
+#                 print(first_articles)
+
+                # END TESTING
+
+                for i in range(3):  # Retry up to three times
+                    try:
+                        articles = self.get_all_articles()
+                        if not articles:
+                            print(f"No articles found on page {start_page} of category {category.value}")
+                            break
+                        else:
+                            for article in articles:
+                                if article is not None and isinstance(article, WebElement):
+                                    scraped_news_article = self.process_article(article, category, start_page - 1)
+                                    print(f"Success: {scraped_news_article.get('article_url')}")
+                                    break  # If the article was processed successfully, break out of the retry loop
+                                else:
+                                    print(f"Article on page {start_page} of category {category.value} is not an article WebElement")
+                    except NoSuchElementException:
+                        print("An error occurred while processing the article. Refreshing the page...")
+                        self.driver.refresh()
+                        continue  # If a NoSuchElementException was raised, continue with the next retry
+                    except Exception as e:
+                        print(f"An error occurred while processing article on page {start_page} of category {category.value}: {str(e)}")
+                        self.driver.refresh()
+                        continue  # If another exception was raised, continue with the next retry
+
+                #     # Introduce a delay of 2 seconds between each article scraping
+                #     # time.sleep(2)
 
                     # Write the last scraped page number to a file
                     with open(f'{category.value}_last_page.txt', 'w') as f:
                         f.write(str(start_page))
-    
+                
+
+
+a
