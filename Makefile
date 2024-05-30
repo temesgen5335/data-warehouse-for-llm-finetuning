@@ -1,11 +1,15 @@
-.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow build_faust build_scraper up_scraper up_faust_save_news build_faust_save_news
+.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow build_faust build_scraper up_scraper up_faust_save_news build_faust_save_news load_env
 
 up:
+	make load_env
 	make up_without_faust
 	make up_faust
 	make up_scraper
 	# make start_airflow
 	# make serve
+
+load_env:
+	bash -c "source .env"
 
 airflow_init:
 	docker compose -f docker-compose_airflow.yaml up airflow-init
