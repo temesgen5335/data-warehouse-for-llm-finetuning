@@ -2,7 +2,7 @@ import pytest
 from pymongo.errors import DuplicateKeyError
 from mongomock import MongoClient
 
-# import the MongoDB class from the database.mongodb module
+# import the MongoDB class from the database module
 from src.database import MongoDB
 
 # In your tests
