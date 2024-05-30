@@ -11,6 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
+
 
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -118,15 +120,16 @@ class NewsScraper:
             print("Error occurred while scrolling to the bottom of the page:", e)
             raise
 
-    def initialize_driver(self, category_page_url) -> None:
-
-        try:
-            self.driver.get(category_page_url)
-            print(category_page_url)
-        except WebDriverException as e:
-            print("Error occurred while navigating to the category page:", e)
-            raise
-
+    def initialize_driver(self, category_page_url):
+        for _ in range(3):  # retry up to 3 times
+            try:
+                self.driver.get(category_page_url)
+                break  # if the navigation succeeds, break out of the loop
+            except TimeoutException:
+                print(f"Navigation timed out while trying to load {category_page_url}, retrying...")
+        else:  # if the loop completes without breaking (i.e., all retries failed)
+            print(f"Failed to load {category_page_url} after 3 attempts")
+            # handle the failure (e.g., skip this page, raise an error, etc.)
 
     def get_all_articles(self):
         try:
