@@ -197,6 +197,8 @@ class NewsScraper:
             image_url = image_element.get_attribute('srcset')
             image_url = re.sub(r'\s\d+w', '', image_url).split(',')[0]
             return image_url.strip()
+        except NoSuchElementException:
+            return ""
         except WebDriverException as e:
             print(f"Error occurred while retrieving the image url of the article at {article.get('article_url')}: {str(e)}")
             return ""
@@ -233,12 +235,29 @@ class NewsScraper:
         except WebDriverException as e:
             print("Error occurred while retrieving the time publish of the article:", e)
             return ""
+        
+    def get_content_details(self):
+        try:
+            # Try to locate the element by id
+            details_element = self.driver.find_element(By.ID, "content-details")
+        except NoSuchElementException:
+            try:
+                # If locating the element by id fails, try to locate it by class name
+                details_element = self.driver.find_element(By.CLASS_NAME, "details")
+            except NoSuchElementException:
+                print("Neither 'content-details' id nor 'details' class were found")
+                return ""
+        except Exception as e:
+            print(f"An error occurred while locating the details element: {str(e)}")
+            return ""
+
+        return details_element.text
 
     def get_article_details(self, article_url, image_url, summary, category_value, title):
         # Navigate to the article URL
         self.driver.get(article_url)
 
-        content = self.driver.find_element(By.ID, 'content-details').text
+        content = self.get_content_details()
         published_date = self.driver.find_element(By.CLASS_NAME, 'tags').find_element(By.TAG_NAME, 'time').text
         author = self.driver.find_element(By.CLASS_NAME, 'card-author').text
 
@@ -319,7 +338,7 @@ class NewsScraper:
 
                 # articles = self.get_all_articles()
 
-                first_articles = articles[:2]
+                # first_articles = articles[:2]
                 
                 # TESTING
 #                 for article in first_articles:
@@ -338,8 +357,13 @@ class NewsScraper:
 #                 print(first_articles)
 
                 # END TESTING
+                from selenium.common.exceptions import NoSuchElementException
 
-                for i in range(3):  # Retry up to three times
+                # ...
+
+                successfully_scraped_urls = set()
+
+                for i in range(3):  # Retry up to three times for the page
                     try:
                         articles = self.get_all_articles()
                         if not articles:
@@ -347,28 +371,41 @@ class NewsScraper:
                             break
                         else:
                             for article in articles:
-                                if article is not None and isinstance(article, WebElement):
-                                    scraped_news_article = self.process_article(article, category, start_page - 1)
-                                    print(f"Success: {scraped_news_article.get('article_url')}")
-                                    break  # If the article was processed successfully, break out of the retry loop
-                                else:
-                                    print(f"Article on page {start_page} of category {category.value} is not an article WebElement")
+                                article_url = self.get_article_url(article)
+                                if article_url in successfully_scraped_urls:
+                                    continue  # Skip this article if it has already been successfully scraped
+
+                                for j in range(3):  # Retry up to three times for each article
+                                    try:
+                                        if article is not None and isinstance(article, WebElement):
+                                            scraped_news_article = self.process_article(article, category, start_page - 1)
+                                            print(f"Success: {scraped_news_article.get('article_url')}")
+                                            successfully_scraped_urls.add(article_url)  # Add the URL of the successfully scraped article to the set
+                                            break  # If the article was processed successfully, break out of the retry loop
+                                        else:
+                                            print(f"Article on page {start_page} of category {category.value} is not an article WebElement")
+                                    except NoSuchElementException:
+                                        print("An error occurred while processing the article. Refreshing the article...")
+                                        self.driver.get(article_url)  # Navigate to the article's URL to refresh it
+                                        time.sleep(1)  # Wait for 1 second to allow the page to load
+                                        continue  # If a NoSuchElementException was raised, continue with the next retry
+                                    except Exception as e:
+                                        print(f"An error occurred while processing article on page {start_page} of category {category.value}: {str(e)}")
+                                        self.driver.get(article_url)  # Navigate to the article's URL to refresh it
+                                        time.sleep(1)  # Wait for 1 second to allow the page to load
+                                        continue  # If another exception was raised, continue with the next retry
                     except NoSuchElementException:
-                        print("An error occurred while processing the article. Refreshing the page...")
+                        print("An error occurred while processing the page. Refreshing the page...")
                         self.driver.refresh()
                         continue  # If a NoSuchElementException was raised, continue with the next retry
                     except Exception as e:
-                        print(f"An error occurred while processing article on page {start_page} of category {category.value}: {str(e)}")
+                        print(f"An error occurred while processing page {start_page} of category {category.value}: {str(e)}")
                         self.driver.refresh()
                         continue  # If another exception was raised, continue with the next retry
 
-                #     # Introduce a delay of 2 seconds between each article scraping
-                #     # time.sleep(2)
 
-                    # Write the last scraped page number to a file
-                    with open(f'{category.value}_last_page.txt', 'w') as f:
-                        f.write(str(start_page))
-                
+                # Write the last scraped page number to a file
+                with open(f'{category.value}_last_page.txt', 'w') as f:
+                    f.write(str(start_page))
 
-
-a
+                        
