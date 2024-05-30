@@ -364,29 +364,22 @@ class NewsScraper:
                 print(f"An error occurred while processing page {start_page} of category {category.value}: {str(e)}")
                 self.driver.refresh()
                 continue  # If another exception was raised, continue with the next retry
-
+            
     def scrape_news(self) -> list[dict]:
         print("Scraping News Started!!")
         news = []
-        for category in NewsCategory:
-            print(category.value)
-            start_page = self.read_last_scraped_page(category)
+        for page in range(1, self.number_of_pages_to_scrape + 1):
+            print(f"Processing page {page}")
+            for category in NewsCategory:
+                print(category.value)
+                last_scraped_page = self.read_last_scraped_page(category)
 
-            # Check if the number of pages to scrape has already been reached
-            if start_page >= self.number_of_pages_to_scrape:
-                print(f"Already scraped {self.number_of_pages_to_scrape} pages for category {category.value}")
-                continue
+                # Check if this page has already been scraped for this category
+                if page <= last_scraped_page:
+                    print(f"Already scraped page {page} for category {category.value}")
+                    continue
 
-            pages_to_scrape = self.number_of_pages_to_scrape - start_page
-
-            while pages_to_scrape > 0:
-                pages_to_scrape -= 1
-                start_page += 1  # Increment the page number
-                print("START PAGE: ", start_page)
-                print("PAGE TO SCRAPE: ", pages_to_scrape)
-
-                self.process_page(category, start_page)
+                self.process_page(category, page)
 
                 # Write the last scraped page number to a file
-                self.write_last_scraped_page(category, start_page)
-                        
+                self.write_last_scraped_page(category, page)
