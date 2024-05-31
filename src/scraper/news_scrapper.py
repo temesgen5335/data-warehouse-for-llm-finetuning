@@ -14,7 +14,6 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 
 
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -85,6 +84,7 @@ class NewsButton(Enum):
 
 class NewsScraper:
     def __init__(self, url: str, headless: bool = True, number_of_pages_to_scrape: int = 2) -> None:
+        self.active_categories = list(NewsCategory)
         self.setup_driver()
         options = Options()
         if headless:
@@ -348,7 +348,7 @@ class NewsScraper:
                 articles = self.get_all_articles()
                 if not articles:
                     print(f"No articles found on page {start_page} of category {category.value}")
-                    break
+                    return False
                 else:
                     for article in articles:
                         article_url = self.get_article_url(article)
@@ -375,6 +375,8 @@ class NewsScraper:
                                 self.driver.get(article_url)  # Navigate to the article's URL to refresh it
                                 time.sleep(1)  # Wait for 1 second to allow the page to load
                                 continue  # If another exception was raised, continue with the next retry
+
+                    return True
             except NoSuchElementException:
                 print("An error occurred while processing the page. Refreshing the page...")
                 self.driver.refresh()
@@ -384,12 +386,14 @@ class NewsScraper:
                 self.driver.refresh()
                 continue  # If another exception was raised, continue with the next retry
             
+            
     def scrape_news(self) -> list[dict]:
         print("Scraping News Started!!")
         news = []
         for page in range(1, self.number_of_pages_to_scrape + 1):
             print(f"Processing page {page}")
-            for category in NewsCategory:
+            for category in list(self.active_categories):  # iterate over a copy of the list
+                print(f"Processing page {page}")
                 print(category.value)
                 last_scraped_page = self.read_last_scraped_page(category)
 
@@ -398,7 +402,9 @@ class NewsScraper:
                     print(f"Already scraped page {page} for category {category.value}")
                     continue
 
-                self.process_page(category, page)
+                if not self.process_page(category, page):
+                    self.active_categories.remove(category)
 
                 # Write the last scraped page number to a file
                 self.write_last_scraped_page(category, page)
+                
