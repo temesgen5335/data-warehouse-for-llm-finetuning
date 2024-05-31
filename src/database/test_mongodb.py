@@ -143,3 +143,14 @@ class TestMongoDB:
         assert lines == ['value1 value2\n', 'value3 value4\n']
         # Delete the output file after the test is finished
         os.remove(output_file)
+
+    def test_remove_duplicates(self):
+        self.setup_method(None)
+        content = [{"key": "value1"}, {"key": "value1"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        field = 'key'
+        self.mongodb.remove_duplicates(field)
+        results = list(self.mongodb.find())
+        # Check if the duplicates are removed successfully
+        assert len(results) == 1

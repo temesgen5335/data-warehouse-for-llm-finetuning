@@ -89,3 +89,26 @@ class MongoDB:
 
                 # Write the preprocessed text to the file, followed by a newline
                 f.write(text + '\n')
+
+
+    def remove_duplicates(self, field: str, collection_name:str =None):
+        # If no collection name is provided, use self.collection
+        collection = self.db[collection_name] if collection_name else self.collection
+
+        pipeline = [
+            { "$group": {
+                "_id": { field: f"${field}" },  
+                "uniqueIds": { "$addToSet": "$_id" },
+                "count": { "$sum": 1 }
+            }},
+            { "$match": {
+                "count": { "$gt": 1 }
+            }}
+        ]
+
+        duplicates = collection.aggregate(pipeline)
+
+        for duplicate in duplicates:
+            ids_to_remove = duplicate['uniqueIds'][1:]  # keep the first one, remove the rest
+            for id_to_remove in ids_to_remove:
+                collection.delete_one({'_id': id_to_remove})
