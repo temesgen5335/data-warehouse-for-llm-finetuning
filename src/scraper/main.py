@@ -5,7 +5,7 @@ from kafka.errors import NoBrokersAvailable
 
 def main():
     url = 'https://am.al-ain.com/'
-    pages_to_scrape = 1000000
+    pages_to_scrape = 1000
     scraper = NewsScraper(url=url, number_of_pages_to_scrape=pages_to_scrape)
     scraper.scrape_news()
 
