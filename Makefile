@@ -18,7 +18,7 @@ up_without_faust:
 	docker compose -f compose.yaml up -d --remove-orphans $(filter-out faust,$(shell docker-compose -f compose.yaml config --services))
 
 up_faust:
-	# make build_faust
+	make build_faust
 	docker compose -f compose.yaml up -d faust
 
 build_faust:
@@ -28,7 +28,7 @@ build_faust_save_news:
 	docker compose -f compose.yaml build faust_save_news
 
 up_faust_save_news:
-	# make build_faust_save_news
+	make build_faust_save_news
 	docker compose -f compose.yaml up -d faust_save_news
 
 start_airflow:
@@ -40,7 +40,7 @@ build_scraper:
 	docker compose -f compose.yaml build scraper
 
 up_scraper:
-	# make build_scraper
+	make build_scraper
 	docker compose -f compose.yaml up -d scraper
 
 down:
