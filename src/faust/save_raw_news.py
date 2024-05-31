@@ -3,13 +3,12 @@ import os
 import sys
 
 
-
 from datetime import datetime
 from models import ScrapedNews
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# os.chdir("../")
+os.chdir("../")
 from database import MongoDB
 
 print(os.getcwd())
@@ -26,12 +25,13 @@ app = faust.App('myapp', broker=KAFKA_BROKER_URL)
 scraped_data_topic = app.topic('scraping', value_type=ScrapedNews)
 
 # create a MongoDB instance (for saving the data after processing)
-mongodb = MongoDB(db_name="clean_data", collection_name="alain_news_clean", connection_string="mongodb://localhost:27018/")
+clean_db = MongoDB(db_name="clean_data", collection_name="alain_news_clean", connection_string="mongodb://172.31.58.223:27017/")
+archive_db = MongoDB(db_name="archive", collection_name="alain_news_archive", connection_string="mongodb://172.31.58.223:27017/")
 
 @app.agent(scraped_data_topic)
 async def save_raw_news(scraped_data):
   # Initialize the ArticleProcessor
-  processor = ArticleProcessor(cleaned_collection=mongodb, columns_to_process=['content', 'title', 'summary'])
+  processor = ArticleProcessor(archive_collection=archive_db, cleaned_collection=clean_db, columns_to_process=['content', 'title', 'summary'])
 
   async for data in scraped_data:
     # Convert the data to a dictionary
@@ -48,6 +48,7 @@ async def save_raw_news(scraped_data):
         # mongodb.insert_content(processed_data)
 
         print(type(processed_data))
+        
         print(processed_data.get("article_url"))
 
 if __name__ == '__main__':
