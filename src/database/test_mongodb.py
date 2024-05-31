@@ -1,3 +1,4 @@
+import os
 import pytest
 from pymongo.errors import DuplicateKeyError
 from mongomock import MongoClient
@@ -134,8 +135,11 @@ class TestMongoDB:
         for c in content:
             self.mongodb.insert_content(c)
         fields = ['key1', 'key2']
-        self.mongodb.save_content_to_txt(fields, output_file='output.txt')
-        with open('output.txt', 'r') as f:
+        output_file = 'output.txt'
+        self.mongodb.save_content_to_txt(fields, output_file=output_file)
+        with open(output_file, 'r') as f:
             lines = f.readlines()
         # Check if the content is saved to the output file successfully
         assert lines == ['value1 value2\n', 'value3 value4\n']
+        # Delete the output file after the test is finished
+        os.remove(output_file)
