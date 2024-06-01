@@ -55,6 +55,7 @@ services:
       - '9093:9093'
       - '9094:9094'
     environment:
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@<your_host>:9093
