@@ -96,7 +96,7 @@ class Normalize:
 
 
     def tokenize(self, corpus):
-        sentences = re.compile('[!?።(\፡\፡)]+').split(corpus)
+        sentences = re.compile('[!?።=(\፡\፡)]+').split(corpus)
         all_tokens = []
         for sentence in sentences:
             tokens = re.split(r'\s+|:', sentence)
