@@ -1,0 +1,5 @@
+selenium
+enum34
+python-dotenv
+watchdog[watchmedo]
+kafka-python
