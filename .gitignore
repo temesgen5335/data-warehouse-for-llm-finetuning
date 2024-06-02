@@ -16,7 +16,6 @@ cache_dir
 # Datasets and data files
 *.txt
 
-
 geckodriver
 geckodriver*
 chromedriver*
