@@ -13,3 +13,6 @@ uvicorn
 pandas
 transformers
 sentencepiece
+datasets
+pandas
+torch==2.0.1

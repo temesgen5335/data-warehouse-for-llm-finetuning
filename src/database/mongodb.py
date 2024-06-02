@@ -73,3 +73,42 @@ class MongoDB:
         collection_name = self.MONGO_COLLECTION_NAME if collection_name is None else collection_name
         collection = self.create_collection(collection_name)
         return collection.find(filter_col)
+    
+    def save_content_to_txt(self, fields: list[str], filter_col: dict = None, collection_name: str = None, output_file: str = 'output.txt'):
+        # Get all content from MongoDB
+        documents = self.get_all_content(filter_col, collection_name)
+
+        # Open the output file
+        with open(output_file, 'w') as f:
+            # Iterate over the documents
+            for doc in documents:
+                # Concatenate the data from the given fields
+                text = ' '.join(doc[field] for field in fields if field in doc)
+
+                # Preprocess the text here (e.g., remove irrelevant characters, normalize case, etc.)
+
+                # Write the preprocessed text to the file, followed by a newline
+                f.write(text + '\n')
+
+
+    def remove_duplicates(self, field: str, collection_name:str =None):
+        # If no collection name is provided, use self.collection
+        collection = self.db[collection_name] if collection_name else self.collection
+
+        pipeline = [
+            { "$group": {
+                "_id": { field: f"${field}" },  
+                "uniqueIds": { "$addToSet": "$_id" },
+                "count": { "$sum": 1 }
+            }},
+            { "$match": {
+                "count": { "$gt": 1 }
+            }}
+        ]
+
+        duplicates = collection.aggregate(pipeline)
+
+        for duplicate in duplicates:
+            ids_to_remove = duplicate['uniqueIds'][1:]  # keep the first one, remove the rest
+            for id_to_remove in ids_to_remove:
+                collection.delete_one({'_id': id_to_remove})

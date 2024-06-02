@@ -1,13 +1,10 @@
+import os
 import pytest
 from pymongo.errors import DuplicateKeyError
 from mongomock import MongoClient
 
-import os
-
-os.chdir('../')
-
-# import the MongoDB class from the database.mongodb module
-from database.mongodb import MongoDB
+# import the MongoDB class from the database module
+from src.database import MongoDB
 
 # In your tests
 class TestMongoDB:
@@ -119,3 +116,41 @@ class TestMongoDB:
         
         # Check if all content is retrieved successfully
         assert results == content
+
+    def test_save_content_to_txt(self):
+        self.setup_method(None)
+        content = [{"key": "value1"}, {"key": "value2"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        fields = ['key']
+        self.mongodb.save_content_to_txt(fields, output_file='output.txt')
+        with open('output.txt', 'r') as f:
+            lines = f.readlines()
+        # Check if the content is saved to the output file successfully
+        assert lines == ['value1\n', 'value2\n']
+
+    def test_save_content_to_txt_with_many_fields(self):
+        self.setup_method(None)
+        content = [{"key1": "value1", "key2": "value2"}, {"key1": "value3", "key2": "value4"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        fields = ['key1', 'key2']
+        output_file = 'output.txt'
+        self.mongodb.save_content_to_txt(fields, output_file=output_file)
+        with open(output_file, 'r') as f:
+            lines = f.readlines()
+        # Check if the content is saved to the output file successfully
+        assert lines == ['value1 value2\n', 'value3 value4\n']
+        # Delete the output file after the test is finished
+        os.remove(output_file)
+
+    def test_remove_duplicates(self):
+        self.setup_method(None)
+        content = [{"key": "value1"}, {"key": "value1"}]
+        for c in content:
+            self.mongodb.insert_content(c)
+        field = 'key'
+        self.mongodb.remove_duplicates(field)
+        results = list(self.mongodb.find())
+        # Check if the duplicates are removed successfully
+        assert len(results) == 1

@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,6 +23,20 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import time
 import platform
+
+from rich.console import Console
+from rich.table import Table
+from rich.theme import Theme
+
+# Create a logging custom theme
+custom_theme = Theme({
+    "success": "green",
+    "info": "spring_green4"
+})
+
+# initialize the console with the custom theme
+console = Console(theme=custom_theme, force_terminal=True)
+
 # import logging
 # import sys
 # 
@@ -44,6 +59,7 @@ for i in range(MAX_RETRIES):
     try:
         producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v).encode('utf-8'))
         # If the initialization is successful, break from the loop
+        console.print(f"[success]Kafka producer initialized successfully[/success]")
         break
     except NoBrokersAvailable as e:
         print(f"An error occurred: {e}")
@@ -68,6 +84,7 @@ class NewsButton(Enum):
 
 class NewsScraper:
     def __init__(self, url: str, headless: bool = True, number_of_pages_to_scrape: int = 2) -> None:
+        self.active_categories = list(NewsCategory)
         self.setup_driver()
         options = Options()
         if headless:
@@ -103,15 +120,16 @@ class NewsScraper:
             print("Error occurred while scrolling to the bottom of the page:", e)
             raise
 
-    def initialize_driver(self, category_page_url) -> None:
-
-        try:
-            self.driver.get(category_page_url)
-            print(category_page_url)
-        except WebDriverException as e:
-            print("Error occurred while navigating to the category page:", e)
-            raise
-
+    def initialize_driver(self, category_page_url):
+        for _ in range(3):  # retry up to 3 times
+            try:
+                self.driver.get(category_page_url)
+                break  # if the navigation succeeds, break out of the loop
+            except TimeoutException:
+                print(f"Navigation timed out while trying to load {category_page_url}, retrying...")
+        else:  # if the loop completes without breaking (i.e., all retries failed)
+            print(f"Failed to load {category_page_url} after 3 attempts")
+            # handle the failure (e.g., skip this page, raise an error, etc.)
 
     def get_all_articles(self):
         try:
@@ -293,7 +311,7 @@ class NewsScraper:
 
             # Send the article to a Kafka topic in Kafka, for further processing
             producer.send(KAFKA_TOPIC, article_details)
-            print(f"Sent article to Kafka: {article_details.get('article_url')}")
+            console.print("[info]Sent article to Kafka[/info]")
 
             # Close the current tab
             self.driver.close()
@@ -330,7 +348,7 @@ class NewsScraper:
                 articles = self.get_all_articles()
                 if not articles:
                     print(f"No articles found on page {start_page} of category {category.value}")
-                    break
+                    return False
                 else:
                     for article in articles:
                         article_url = self.get_article_url(article)
@@ -341,7 +359,8 @@ class NewsScraper:
                             try:
                                 if article is not None and isinstance(article, WebElement):
                                     scraped_news_article = self.process_article(article, category, start_page - 1)
-                                    print(f"Success: {scraped_news_article.get('article_url')}")
+                                    console.print(f"[success]Success[/success]: {scraped_news_article.get('article_url')}")
+                                    # print(f"Success: {scraped_news_article.get('article_url')}")
                                     successfully_scraped_urls.add(article_url)  # Add the URL of the successfully scraped article to the set
                                     break  # If the article was processed successfully, break out of the retry loop
                                 else:
@@ -356,6 +375,8 @@ class NewsScraper:
                                 self.driver.get(article_url)  # Navigate to the article's URL to refresh it
                                 time.sleep(1)  # Wait for 1 second to allow the page to load
                                 continue  # If another exception was raised, continue with the next retry
+
+                    return True
             except NoSuchElementException:
                 print("An error occurred while processing the page. Refreshing the page...")
                 self.driver.refresh()
@@ -365,12 +386,14 @@ class NewsScraper:
                 self.driver.refresh()
                 continue  # If another exception was raised, continue with the next retry
             
+            
     def scrape_news(self) -> list[dict]:
         print("Scraping News Started!!")
         news = []
         for page in range(1, self.number_of_pages_to_scrape + 1):
             print(f"Processing page {page}")
-            for category in NewsCategory:
+            for category in list(self.active_categories):  # iterate over a copy of the list
+                print(f"Processing page {page}")
                 print(category.value)
                 last_scraped_page = self.read_last_scraped_page(category)
 
@@ -379,7 +402,9 @@ class NewsScraper:
                     print(f"Already scraped page {page} for category {category.value}")
                     continue
 
-                self.process_page(category, page)
+                if not self.process_page(category, page):
+                    self.active_categories.remove(category)
 
                 # Write the last scraped page number to a file
                 self.write_last_scraped_page(category, page)
+                
