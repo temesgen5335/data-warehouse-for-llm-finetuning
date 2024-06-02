@@ -1,5 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, LlamaForCausalLM
-from peft import LoraConfig, get_peft_model, prepare_model_for_int8_training
+from peft import LoraConfig, # Apply LoRA to the model
+model = get_peft_model(model, lora_config), prepare_model_for_int8_training
 
 # Load the base model and tokenizer
 model_name = "Samuael/llama-2-7b-tebot-amharic"

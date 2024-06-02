@@ -36,8 +36,8 @@ def main(
     repetition_penalty: float=1.0, #The parameter for repetition penalty. 1.0 means no penalty.
     length_penalty: int=1, #[optional] Exponential penalty to the length that is used with beam-based generation. 
     enable_azure_content_safety: bool=False, # Enable safety check with Azure content safety api
-    enable_sensitive_topics: bool=False, # Enable check for sensitive topics using AuditNLG APIs
-    enable_saleforce_content_safety: bool=False, # Enable safety check woth Saleforce safety flan t5
+    enable_sensitive_topics: bool=False, # Enable checth k for sensitive topics using AuditNLG APIs
+    enable_saleforce_content_safety: bool=False, # Enable safety check woSaleforce safety flan t5
     **kwargs
 ):    
     
