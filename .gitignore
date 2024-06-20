@@ -1,6 +1,28 @@
 /data/
 
+data
+
 logs
+
+# LLM files and models
+*.model
+*.vocab
+
+m.*
+
+
+cache_dir
+
+# Datasets and data files
+*.txt
+
+geckodriver
+geckodriver*
+chromedriver*
+
+processed_files.log
+
+*last_page.txt
 
 # Airflow configuration
 airflow.cfg

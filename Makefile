@@ -1,15 +1,53 @@
-.PHONY: up init down clean serve test
+.PHONY: up init down clean serve test up_without_faust up_faust start_airflow airflow_init stop_airflow build_faust build_scraper up_scraper up_faust_save_news build_faust_save_news load_env
 
 up:
-	make init
-	docker compose -f docker-compose_airflow.yaml -f compose.yaml up -d
-	make serve
+	make load_env
+	make up_without_faust
+	make up_faust
+	make up_scraper
+	# make start_airflow
+	# make serve
 
-init:
+load_env:
+	bash -c "source .env"
+
+airflow_init:
 	docker compose -f docker-compose_airflow.yaml up airflow-init
+
+up_without_faust:
+	docker compose -f compose.yaml up -d --remove-orphans $(filter-out faust,$(shell docker-compose -f compose.yaml config --services))
+
+up_faust:
+	make build_faust
+	docker compose -f compose.yaml up -d faust
+
+build_faust:
+	docker compose -f compose.yaml build faust
+
+build_faust_save_news:
+	docker compose -f compose.yaml build faust_save_news
+
+up_faust_save_news:
+	make build_faust_save_news
+	docker compose -f compose.yaml up -d faust_save_news
+
+start_airflow:
+	mkdir -p ./dags ./logs ./plugins ./config
+	make airflow_init
+	docker compose -f docker-compose_airflow.yaml up -d
+
+build_scraper:
+	docker compose -f compose.yaml build scraper
+
+up_scraper:
+	make build_scraper
+	docker compose -f compose.yaml up -d scraper
 
 down:
 	docker compose -f docker-compose_airflow.yaml -f compose.yaml down
+
+stop_airflow:
+	docker compose -f docker-compose_airflow.yaml down
 
 clean:
 	make stop
@@ -22,4 +60,3 @@ serve:
 
 test:
 	while read line; do echo $$line | xargs http; done < test_main.http
-
